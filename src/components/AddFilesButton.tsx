@@ -24,6 +24,7 @@ const AddFilesButton: React.FC<AddFilesButtonProps> = ({ handleAddFile }) => {
   return (
     <>
       <button
+        contentEditable={false}
         className="flex items-center gap-2 bg-[#FFFFFF33] text-white text-xs py-1 px-2 rounded-3xl mx-auto"
         onClick={handleButtonClick}
       >

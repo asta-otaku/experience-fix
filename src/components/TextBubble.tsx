@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, useRef } from "react";
+import React, { useImperativeHandle, useRef, useEffect } from "react";
 import "./TextBubble.css";
 import AddFilesButton from "./AddFilesButton";
 import brid from "../assets/brid.svg";
@@ -23,6 +23,12 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
   } = props;
   const contentEditableRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (contentEditableRef.current) {
+      contentEditableRef.current.focus();
+    }
+  }, []);
+
   const insertFileToken = (file: File) => {
     if (contentEditableRef.current) {
       const range = window.getSelection()?.getRangeAt(0);
@@ -36,6 +42,7 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
         fileTokenElement.style.borderRadius = "12px";
         fileTokenElement.style.margin = "0 5px";
         fileTokenElement.style.display = "inline-flex";
+        fileTokenElement.style.alignItems = "center";
         fileTokenElement.style.width = "fit-content";
 
         const thumbnail = document.createElement("img");
@@ -65,8 +72,8 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
   return (
     <div
       className={`bg-gradient-to-b from-[#3076FF] to-[#1D49E5] w-full h-full trunc rounded-2xl pb-2 -translate-y-16 relative ${
-        step >= 2 && !linkGenerated ? "opacity-70" : ""
-      }`}
+        step >= 2 && !linkGenerated ? "opacity-70 cursor-none" : ""
+      } ${step >= 1 && step !== 4 ? "mb-44" : ""}`}
     >
       <div className="text-bubble w-full">
         <div
@@ -95,39 +102,34 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
 
       {/* Conditionally render brid and loader images when step is 2 */}
       {step >= 2 && (
-        <>
-          {/* Brid image with overlay */}
-          <div className="absolute bottom-0 left-0 w-full h-[85%] z-10">
-            <img
-              src={brid}
-              alt="Brid"
-              className="w-full h-full object-cover rounded-lg"
-            />
-            <div
-              className={`absolute inset-0 bg-black/50 opacity-30 rounded-lg ${
-                linkGenerated ? "hidden" : ""
-              }`}
-            ></div>
-            <div
-              className={`flex w-full justify-center ${
-                linkGenerated ? "hidden" : ""
-              }`}
-            >
-              <p className="text-white text-xs absolute bottom-4 text-center w-[150px] bg-[#19191980] py-1 px-2 rounded-full">
-                1.9GB/2GB Uploaded
-              </p>
-            </div>
-
-            {/* Loader image centered within the brid overlay */}
-            <div
-              className={`absolute inset-0 flex items-center justify-center ${
-                linkGenerated ? "hidden" : ""
-              }`}
-            >
-              <img src={loader} alt="Loader" className="w-full" />
-            </div>
+        <div className="mt-2 relative translate-y-3">
+          <img
+            src={brid}
+            alt="Brid"
+            className="w-full h-full object-cover rounded-lg"
+          />
+          <div
+            className={`absolute inset-0 bg-black/50 opacity-30 rounded-lg ${
+              linkGenerated ? "hidden" : ""
+            }`}
+          ></div>
+          <div
+            className={`absolute inset-0 flex items-center justify-center ${
+              linkGenerated ? "hidden" : ""
+            }`}
+          >
+            <img src={loader} alt="Loader" className="w-full" />
           </div>
-        </>
+          <div
+            className={`flex w-full justify-center ${
+              linkGenerated ? "hidden" : ""
+            }`}
+          >
+            <p className="text-white text-xs absolute bottom-4 text-center w-[150px] bg-[#19191980] py-1 px-2 rounded-full">
+              1.9GB/2GB Uploaded
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

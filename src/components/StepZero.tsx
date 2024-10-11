@@ -57,7 +57,7 @@ function StepZero({ handleNext }: { handleNext: () => void }) {
               onClick={() => setSelectedToken1("token3")}
               className={`inline-flex items-center gap-0.5 text-xs py-1 px-2 rounded-3xl w-fit cursor-pointer ${
                 selectedToken1 === "token3"
-                  ? "bg-white/80 text-secondary"
+                  ? "bg-white text-secondary"
                   : "bg-[#FFFFFF33] text-white"
               }`}
             >

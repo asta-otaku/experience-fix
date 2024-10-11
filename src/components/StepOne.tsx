@@ -22,8 +22,8 @@ function StepOne() {
   const [linkGenerated, setLinkGenerated] = useState(false);
 
   return (
-    <div className="w-full h-full flex justify-center items-center flex-col pb-16 relative p-4">
-      <div className="flex flex-col gap-6 self-stretch md:self-auto w-[360px] items-start mx-auto p-6">
+    <div className="w-full min-h-screen flex justify-center items-center flex-col py-16 relative p-4">
+      <div className="flex flex-col gap-6 self-stretch md:self-auto w-[360px] items-start mx-auto p-6 mt-6">
         <TextBubble
           ref={textBubbleRef} // Pass the ref here
           selectedFiles={selectedFiles}

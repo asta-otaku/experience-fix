@@ -26,7 +26,7 @@
     overflow: hidden; 
     overflow-y: auto; /* Allow vertical scrolling */
     outline: none;
-    height: 250px; /* Minimum height */
+    min-height: 250px;
     text-align: left;
   }
   
