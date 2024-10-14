@@ -32,7 +32,7 @@ const GenerateLinkButton = ({
   return (
     <button
       onClick={handleButtonClick}
-      disabled={disabledState}
+      disabled={disabledState || generatedLink !== ""}
       className={`bg-[#F3F3F3BF] text-secondary px-4 py-2.5 rounded-full w-[250px] flex items-center gap-2 font-semibold ${
         disabledState ? "opacity-40 cursor-not-allowed" : ""
       } shadow-sm shadow-secondary`}
