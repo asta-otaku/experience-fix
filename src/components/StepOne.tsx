@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import TextBubble from "./TextBubble";
 import StepOneBottom from "./StepOneBottom";
 
@@ -17,6 +17,29 @@ function StepOne() {
       textBubbleRef.current.insertFileToken(file); // Call the function through the ref
     }
   };
+
+  const handleDrop = (event: DragEvent) => {
+    event.preventDefault();
+    if (event.dataTransfer?.files) {
+      Array.from(event.dataTransfer.files).forEach((file) =>
+        handleAddFile(file)
+      );
+    }
+  };
+
+  const handleDragOver = (event: DragEvent) => {
+    event.preventDefault();
+  };
+
+  useEffect(() => {
+    window.addEventListener("dragover", handleDragOver);
+    window.addEventListener("drop", handleDrop);
+
+    return () => {
+      window.removeEventListener("dragover", handleDragOver);
+      window.removeEventListener("drop", handleDrop);
+    };
+  }, []);
 
   const [step, setStep] = useState(0);
   const [linkGenerated, setLinkGenerated] = useState(false);

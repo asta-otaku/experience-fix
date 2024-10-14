@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, useRef, useEffect } from "react";
+import React, { useImperativeHandle, useRef, useEffect, useState } from "react";
 import "./TextBubble.css";
 import AddFilesButton from "./AddFilesButton";
 import brid from "../assets/brid.svg";
@@ -21,7 +21,17 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
     setDisabledState,
     step,
   } = props;
+
   const contentEditableRef = useRef<HTMLDivElement>(null);
+  const [ttl, setTtl] = useState<string>("");
+
+  // Create a ref to keep track of the latest ttl value
+  const ttlRef = useRef<string>(ttl);
+
+  // Sync the ttlRef value whenever ttl changes
+  useEffect(() => {
+    ttlRef.current = ttl;
+  }, [ttl]);
 
   useEffect(() => {
     if (contentEditableRef.current) {
@@ -34,16 +44,23 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
       const range = window.getSelection()?.getRangeAt(0);
       if (range) {
         const fileTokenElement = document.createElement("span");
-        fileTokenElement.className = "file-token";
+
+        // Apply active or inactive styles based on ttlRef value
+        fileTokenElement.className = `file-token ${
+          ttlRef.current === file.name ? "active-token" : "inactive-token"
+        }`;
         fileTokenElement.contentEditable = "false"; // Make token non-editable
-        fileTokenElement.style.background = "white";
-        fileTokenElement.style.color = "blue";
         fileTokenElement.style.padding = "0 5px";
         fileTokenElement.style.borderRadius = "12px";
         fileTokenElement.style.margin = "0 5px";
         fileTokenElement.style.display = "inline-flex";
         fileTokenElement.style.alignItems = "center";
         fileTokenElement.style.width = "fit-content";
+
+        // Add an onclick handler to set the active token
+        fileTokenElement.onclick = () => {
+          setTtl(file.name); // This updates the state
+        };
 
         const thumbnail = document.createElement("img");
         thumbnail.src = URL.createObjectURL(file);
@@ -78,7 +95,7 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
       <div className="text-bubble w-full">
         <div
           ref={contentEditableRef}
-          className="text-input w-full"
+          className="text-input w-full h-36 overflow-y-auto"
           contentEditable={step < 2}
           suppressContentEditableWarning={true}
           onInput={() => {
@@ -94,14 +111,14 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
         >
           {/* Inline file tokens and text will appear here */}
           {selectedFiles.map((_, index) => (
-            <span key={index} className="file-token-button"></span>
+            <span key={index}></span>
           ))}
         </div>
       </div>
       <AddFilesButton handleAddFile={handleAddFile} />
 
-      {/* Conditionally render brid and loader images when step is 2 */}
-      {step >= 2 && (
+      {/* Conditionally render brid and loader images only if there's an actual file */}
+      {selectedFiles.length > 0 && step >= 2 && (
         <div className="mt-2 relative translate-y-3">
           <img
             src={brid}

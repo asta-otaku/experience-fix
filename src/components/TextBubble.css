@@ -40,3 +40,23 @@
     line-height: 22px;
     letter-spacing: -0.408px;
   }
+
+    .file-token {
+      display: inline-flex;
+      align-items: center;
+      margin: 0 5px;
+      padding: 0 5px;
+      border-radius: 12px;
+      width: fit-content;
+      cursor: pointer;
+    }
+  
+    .file-token.active-token {
+      background-color: white;
+      color: blue;
+    }
+  
+    .file-token.inactive-token {
+      background-color: #ffffff33;
+      color: white;
+    }

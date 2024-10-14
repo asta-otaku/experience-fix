@@ -1,6 +1,7 @@
 import { useState } from "react";
 import brid from "../assets/brid.svg";
 import links from "../assets/chain.svg";
+import whitelinks from "../assets/whitechain.svg";
 import plusIcon from "../assets/plus.svg";
 
 function StepZero({ handleNext }: { handleNext: () => void }) {
@@ -63,7 +64,9 @@ function StepZero({ handleNext }: { handleNext: () => void }) {
             >
               <div className="tokenPill">
                 <div className="thumbnail">
-                  <img src={links}></img>
+                  <img
+                    src={selectedToken1 === "token3" ? links : whitelinks}
+                  ></img>
                 </div>
 
                 <span>links</span>
