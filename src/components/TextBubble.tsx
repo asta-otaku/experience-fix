@@ -47,6 +47,7 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
         fileTokenElement.style.display = "inline-flex";
         fileTokenElement.style.alignItems = "center";
         fileTokenElement.style.width = "fit-content";
+        fileTokenElement.style.userSelect = "none"; // Prevent token from being copied
 
         // Add an onclick handler to set the active token and deactivate others
         fileTokenElement.onclick = (e) => {
@@ -98,7 +99,7 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
       <div className="text-bubble w-full">
         <div
           ref={contentEditableRef}
-          className="text-input w-full h-36 overflow-y-auto"
+          className="text-input w-full h-full overflow-visible"
           contentEditable={step < 2}
           suppressContentEditableWarning={true}
           onInput={() => {
