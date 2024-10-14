@@ -24,14 +24,7 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
 
   const contentEditableRef = useRef<HTMLDivElement>(null);
   const [ttl, setTtl] = useState<string>("");
-
-  // Create a ref to keep track of the latest ttl value
-  const ttlRef = useRef<string>(ttl);
-
-  // Sync the ttlRef value whenever ttl changes
-  useEffect(() => {
-    ttlRef.current = ttl;
-  }, [ttl]);
+  console.log(ttl);
 
   useEffect(() => {
     if (contentEditableRef.current) {
@@ -45,10 +38,8 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
       if (range) {
         const fileTokenElement = document.createElement("span");
 
-        // Apply active or inactive styles based on ttlRef value
-        fileTokenElement.className = `file-token ${
-          ttlRef.current === file.name ? "active-token" : "inactive-token"
-        }`;
+        // Apply inactive styles initially
+        fileTokenElement.className = "file-token inactive-token";
         fileTokenElement.contentEditable = "false"; // Make token non-editable
         fileTokenElement.style.padding = "0 5px";
         fileTokenElement.style.borderRadius = "12px";
@@ -57,9 +48,21 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
         fileTokenElement.style.alignItems = "center";
         fileTokenElement.style.width = "fit-content";
 
-        // Add an onclick handler to set the active token
-        fileTokenElement.onclick = () => {
-          setTtl(file.name); // This updates the state
+        // Add an onclick handler to set the active token and deactivate others
+        fileTokenElement.onclick = (e) => {
+          const tokens =
+            contentEditableRef.current?.querySelectorAll(".file-token");
+          tokens?.forEach((token) => {
+            token.classList.remove("active-token");
+            token.classList.add("inactive-token");
+          });
+
+          if (e.currentTarget) {
+            const token = e.currentTarget as HTMLSpanElement;
+            token.classList.add("active-token");
+            token.classList.remove("inactive-token");
+            setTtl(file.name);
+          }
         };
 
         const thumbnail = document.createElement("img");

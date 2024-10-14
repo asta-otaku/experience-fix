@@ -1,10 +1,9 @@
 import { useState } from "react";
 import StepZero from "./components/StepZero";
 import StepOne from "./components/StepOne";
-import TapTip from "./components/TapTip";
 
 function App() {
-  const [step, setStep] = useState(3);
+  const [step, setStep] = useState(0);
   const [transitioning, setTranstioning] = useState("");
 
   const handleNext = () => {
@@ -37,7 +36,6 @@ function App() {
         {
           0: <StepZero handleNext={handleNext} />,
           1: <StepOne />,
-          3: <TapTip />,
         }[step]
       }
     </div>
