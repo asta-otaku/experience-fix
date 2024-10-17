@@ -1,12 +1,17 @@
-import React, { useCallback, useImperativeHandle, useRef } from "react";
+import React, {
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { Paragraph } from "@tiptap/extension-paragraph";
 import { FileTokenNode } from "./fileTokenExtenstion";
 import "../TextBubble.css";
-import brid from "../../assets/brid.svg";
 import doc from "../../assets/doc.svg";
 import loader from "../../assets/loader.svg";
+import PreviewBox from "./PreviewBox";
 
 interface FileData {
   file: File;
@@ -32,6 +37,8 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
     setSelectedFiles,
   } = props;
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -47,7 +54,6 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
     <p></p>
     `,
     onUpdate: ({ editor }) => {
-      // Set the disabled state based on editor content
       if (editor.isEmpty) {
         setDisabledState(true);
       } else {
@@ -62,17 +68,42 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
           "w-[290px] text-left min-h-[220px] text-white text-left overflow-visible focus:outline-none",
       },
     },
+    onSelectionUpdate: ({ editor }) => {
+      const currentSelection = editor.state.selection;
+      const from = currentSelection.from;
+      const to = currentSelection.to;
+
+      let selectedToken: FileData | undefined;
+
+      selectedFiles.forEach((fileData) => {
+        const { placeholderId } = fileData;
+        editor.view.state.doc.descendants((node, pos) => {
+          if (
+            node.attrs?.placeholderId === placeholderId &&
+            pos >= from &&
+            pos <= to
+          ) {
+            selectedToken = fileData;
+            return false;
+          }
+        });
+      });
+
+      if (selectedToken) {
+        setSelectedFile(selectedToken.file);
+      } else {
+        setSelectedFile(null);
+      }
+    },
   });
 
-  // Function to insert file tokens inline in the editor
   const insertFileTokens = useCallback(
     (files: File[]) => {
       files.forEach((file) => {
         const placeholderId = `file-token-${Math.random()
           .toString(36)
-          .substr(2, 9)}`;
+          .substring(2, 9)}`;
 
-        // Insert the token into the editor at the current cursor position
         editor?.commands.insertContent({
           type: "fileToken",
           attrs: {
@@ -81,7 +112,15 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
           },
         });
 
-        setSelectedFiles((prev) => [...prev, { file, placeholderId }]);
+        editor?.commands.insertContent({
+          type: "text",
+          text: " ", // Adds a space after each token
+        });
+
+        setSelectedFiles((prev: FileData[]) => [
+          ...prev,
+          { file, placeholderId },
+        ]);
       });
     },
     [editor, setSelectedFiles]
@@ -99,7 +138,6 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
     }
   };
 
-  // Function to handle the drop event for files
   const handleDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
@@ -107,13 +145,12 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
 
       const files = Array.from(event.dataTransfer.files);
       if (files.length) {
-        insertFileTokens(files); // Insert dropped files as tokens
+        insertFileTokens(files);
       }
     },
     [insertFileTokens]
   );
 
-  // Function to handle drag over event (to allow the drop)
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -130,7 +167,6 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
       onDragOver={handleDragOver}
     >
       <div className="text-bubble w-full h-full text-white">
-        {/* The EditorContent where the file tokens will be inserted inline */}
         <EditorContent editor={editor} />
       </div>
       <>
@@ -153,35 +189,26 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
           multiple
         />
       </>
-      {/* Conditionally render brid and loader images only if there's an actual file and selectedFiles.length > 1 */}
-      {selectedFiles.length > 1 && step >= 2 && (
+      {/* Conditionally render PreviewBox when a file token is selected */}
+      {selectedFile && (
         <div className="mt-2 relative translate-y-3">
-          <img
-            src={brid}
-            alt="Brid"
-            className="w-full h-full object-cover rounded-lg"
-          />
-          <div
-            className={`absolute inset-0 bg-black/50 opacity-30 rounded-lg ${
-              linkGenerated ? "hidden" : ""
-            }`}
-          ></div>
-          <div
-            className={`absolute inset-0 flex items-center justify-center ${
-              linkGenerated ? "hidden" : ""
-            }`}
-          >
-            <img src={loader} alt="Loader" className="w-full" />
+          <div className="flex flex-col items-center w-full max-w-xs">
+            <PreviewBox file={selectedFile} />
           </div>
-          <div
-            className={`flex w-full justify-center ${
-              linkGenerated ? "hidden" : ""
-            }`}
-          >
-            <p className="text-white text-xs absolute bottom-4 text-center w-[150px] bg-[#19191980] py-1 px-2 rounded-full">
-              1.9GB/2GB Uploaded
-            </p>
-          </div>
+          {/* Conditionally display loader and overlay if step >= 2 */}
+          {step >= 2 && (
+            <>
+              <div className="absolute inset-0 bg-black/50 opacity-30 rounded-lg"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <img src={loader} alt="Loader" className="w-full" />
+              </div>
+              <div className="flex w-full justify-center">
+                <p className="text-white text-xs absolute bottom-4 text-center w-[150px] bg-[#19191980] py-1 px-2 rounded-full">
+                  1.9GB/2GB Uploaded
+                </p>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
