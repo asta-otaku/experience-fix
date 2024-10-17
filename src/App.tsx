@@ -1,6 +1,7 @@
 import { useState } from "react";
 import StepZero from "./components/StepZero";
-import StepOne from "./components/StepOne";
+// import StepOne from "./components/StepOne";
+import TipTap from "./components/TipTap";
 
 function App() {
   const [step, setStep] = useState(0);
@@ -35,7 +36,8 @@ function App() {
       {
         {
           0: <StepZero handleNext={handleNext} />,
-          1: <StepOne />,
+          1: <TipTap />,
+          // 2: <StepOne />,
         }[step]
       }
     </div>
