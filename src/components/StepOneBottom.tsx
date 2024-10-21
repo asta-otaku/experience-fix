@@ -36,7 +36,7 @@ function StepOneBottom({
         name: user.name,
         phone: user.countryCode + user.phone,
       });
-      if (res.status === 201) {
+      if (res) {
         setStep(3);
       }
     } catch (error) {

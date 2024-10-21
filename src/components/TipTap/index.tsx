@@ -17,6 +17,7 @@ const App = () => {
   }>(null);
   const [disabledState, setDisabledState] = useState(true);
 
+  // Handle file drop
   const handleDrop = (event: DragEvent) => {
     event.preventDefault();
     event.stopPropagation();
@@ -58,19 +59,20 @@ const App = () => {
     const files = Array.from(event.target.files || []);
 
     if (textBubbleRef.current) {
-      // Filter out files that have already been selected
+      // Filter out duplicate files based on file name
       const newFiles = files.filter(
         (file) => !selectedFiles.some((f) => f.file.name === file.name)
       );
 
       console.log("New files after filtering duplicates:", newFiles);
 
+      // Insert new tokens into the editor if there are any new files
       if (newFiles.length > 0) {
         textBubbleRef.current.insertFileTokens(newFiles); // Insert tokens into the editor
 
-        // Directly replace `selectedFiles` instead of appending
-        setSelectedFiles([
-          ...selectedFiles, // keep the previous files
+        // Update the selected files state to include new files
+        setSelectedFiles((prevFiles) => [
+          ...prevFiles,
           ...newFiles.map((file) => ({
             file,
             placeholderId: `file-token-${Math.random()
@@ -78,6 +80,7 @@ const App = () => {
               .substring(2, 9)}`, // Assign unique placeholderId
           })),
         ]);
+
         console.log("Updated selected files:", [...selectedFiles, ...newFiles]);
       } else {
         console.log("No new files to add.");
@@ -85,14 +88,13 @@ const App = () => {
     }
   };
 
-  // Handle creating the bubble (upload files first, then create the bubble)
+  // Handle bubble creation (upload files, replace placeholders with actual tokens)
   const handleCreateBubble = async () => {
     if (!textBubbleRef.current) {
       console.error("Editor reference not found.");
       return { token: [] };
     }
 
-    // Get editor content
     let bubbleContent = textBubbleRef.current.getEditorContent();
     console.log("Editor content before token replacement:", bubbleContent);
 
@@ -102,23 +104,20 @@ const App = () => {
     }
 
     try {
-      // Upload the selected files and get the created tokens
       console.log("Starting to upload files:", selectedFiles);
       const data = await uploadFiles(
         selectedFiles.map((fileData) => fileData.file)
       );
       console.log("Uploaded files and received tokens:", data);
 
-      // Remove duplicate tokens
       const uniqueTokens = data.filter(
         (token: any, index: number, self: any[]) =>
           index === self.findIndex((t) => t._id === token._id)
       );
-      setCreatedTokens(uniqueTokens); // Update state with unique tokens
+      setCreatedTokens(uniqueTokens);
 
       console.log("Unique tokens after filtering:", uniqueTokens);
 
-      // Replace placeholders with actual token IDs in the bubble content
       uniqueTokens.forEach((token: any) => {
         const placeholderRegex = new RegExp(
           `<file-token filename="${token.fileName}" placeholderid="file-token-[a-z0-9]+"></file-token>`,
@@ -126,26 +125,23 @@ const App = () => {
         );
         bubbleContent = bubbleContent?.replace(
           placeholderRegex,
-          `<file-token id="${token._id}"></file-token>` // Replace placeholder with token ID
+          `<file-token id="${token._id}"></file-token>`
         );
       });
 
       console.log("Final bubble content to send:", bubbleContent);
 
-      // Create the bubble with the processed content and unique token IDs
       const createdBubble = await createBubble(
-        bubbleContent, // Processed content with token IDs
-        uniqueTokens.map((token: any) => token._id), // Send the token IDs
-        "user@example.com" // Example user email
+        bubbleContent,
+        uniqueTokens.map((token: any) => token._id),
+        "user@example.com"
       );
-      setTokens(uniqueTokens.map((token: any) => token._id)); // Update state with token IDs
+      setTokens(uniqueTokens.map((token: any) => token._id));
       console.log("Bubble created successfully:", createdBubble);
 
-      // Clear selected files and tokens after creation
-      setSelectedFiles([]);
+      setSelectedFiles([]); // Clear selected files after creation
       setCreatedTokens([]);
 
-      // Return the list of token IDs
       return { token: uniqueTokens.map((token: any) => token._id) };
     } catch (error) {
       console.error("Error creating bubble:", error);
