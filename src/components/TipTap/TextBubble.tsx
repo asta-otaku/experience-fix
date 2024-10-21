@@ -128,6 +128,7 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
 
   useImperativeHandle(ref, () => ({
     insertFileTokens,
+    getEditorContent: () => editor?.getHTML(),
   }));
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);

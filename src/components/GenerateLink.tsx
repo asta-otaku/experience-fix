@@ -1,27 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import copyIcon from "../assets/copy.svg";
 
 const GenerateLinkButton = ({
   linkGenerated,
+  handleCreateBubble,
   setLinkGenerated,
+  tokens,
 }: {
   linkGenerated: boolean;
+  handleCreateBubble: () => void;
   setLinkGenerated: React.Dispatch<React.SetStateAction<boolean>>;
+  tokens: string[];
 }) => {
   const [disabledState, setDisabledState] = useState(false);
   const [generatedLink, setGeneratedLink] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleButtonClick = () => {
+  useEffect(() => {
+    if (tokens.length > 0) {
+      const newLink = "https://typo.inc/";
+      const concatenatedLink = newLink + tokens[0];
+      setGeneratedLink(concatenatedLink);
+    }
+  }, [tokens]); // Watch for changes in tokens array
+
+  const handleButtonClick = async () => {
     setIsGenerating(true);
     setDisabledState(true);
-    setTimeout(() => {
-      const newLink = "https://typo.inc/123456";
-      setGeneratedLink(newLink);
-      setLinkGenerated(true);
+    try {
+      await handleCreateBubble();
+      setLinkGenerated(true); // Ensure this is updated after the bubble is created
+    } catch (error) {
+      console.error("Error creating bubble:", error);
+    } finally {
       setIsGenerating(false);
       setDisabledState(false);
-    }, 2000);
+    }
   };
 
   const handleCopyLink = () => {
@@ -33,19 +47,21 @@ const GenerateLinkButton = ({
     <button
       onClick={handleButtonClick}
       disabled={disabledState || generatedLink !== ""}
-      className={`bg-[#F3F3F3BF] text-secondary px-4 py-2.5 rounded-full w-[250px] flex items-center gap-2 font-semibold ${
+      className={`bg-[#F3F3F3BF] text-secondary px-4 py-2.5 rounded-full w-[260px] flex items-center gap-2 font-semibold ${
         disabledState ? "opacity-40 cursor-not-allowed" : ""
       } shadow-sm shadow-secondary`}
     >
       {linkGenerated ? (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 max-w-[250px] w-full truncate">
           <img
             src={copyIcon}
             alt="Copy icon"
             className="w-4 h-4 cursor-pointer"
             onClick={handleCopyLink}
           />
-          {generatedLink}
+          <a href={generatedLink} target="_blank" rel="noopener noreferrer">
+            {generatedLink}
+          </a>
         </div>
       ) : isGenerating ? (
         <span className="w-full text-center">Generating link...</span>

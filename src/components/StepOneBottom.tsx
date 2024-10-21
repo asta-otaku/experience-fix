@@ -1,20 +1,50 @@
+import { useState } from "react";
 import back from "../assets/back.svg";
 import exportIcon from "../assets/export.png";
 import GenerateLinkButton from "./GenerateLink";
+import { createUser } from "../services/apiService";
 
 function StepOneBottom({
   disabledState,
   linkGenerated,
+  handleCreateBubble,
   step,
   setStep,
   setLinkGenerated,
+  tokens,
 }: {
   disabledState: boolean;
   linkGenerated: boolean;
+  handleCreateBubble: () => void;
   step: number;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   setLinkGenerated: React.Dispatch<React.SetStateAction<boolean>>;
+  tokens: string[];
 }) {
+  const [user, setUser] = useState({
+    name: "",
+    phone: "",
+    countryCode: "",
+  });
+  const [code, setCode] = useState("");
+  const handleCreateUser = async () => {
+    try {
+      if (!user.name || !user.phone) {
+        return;
+      }
+      const res = await createUser({
+        name: user.name,
+        phone: user.countryCode + user.phone,
+      });
+      if (res.status === 201) {
+        setStep(3);
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+      alert("Error creating user");
+    }
+  };
+
   return (
     <div className="absolute bottom-12">
       {
@@ -34,19 +64,24 @@ function StepOneBottom({
           1: (
             <div className="bg-[#F3F3F3BF] w-[320px] p-6 rounded-2xl">
               <h2 className="text-primary font-bold text-xl max-w-xs w-full text-center">
-                What's your email?
+                What's your name?
               </h2>
               <p className="text-[#7E7E7E] text-sm text-center">
                 We'll send you a copy of your link so you can easily find it in
                 the future!
               </p>
               <input
-                type="email"
-                placeholder="Your email..."
+                name="name"
+                placeholder="Your name..."
+                onChange={(e) => setUser({ ...user, name: e.target.value })}
                 className="rounded-3xl bg-white p-2 px-4 w-full text-primary placeholder:text-[#7E7E7E] outline-none my-4"
               />
               <button
-                onClick={() => setStep(2)}
+                onClick={() => {
+                  if (user.name) {
+                    setStep(2);
+                  }
+                }}
                 className="bg-[#191919CC] text-white rounded-3xl py-3 px-4 w-full font-semibold"
               >
                 Continue
@@ -63,7 +98,13 @@ function StepOneBottom({
                 the future!
               </p>
               <div className="flex gap-2 items-center my-4">
-                <select className="rounded-3xl bg-white p-2 px-4 appearance-none w-[120px] text-primary placeholder:text-primary outline-none">
+                <select
+                  className="rounded-3xl bg-white p-2 px-4 appearance-none w-[120px] text-primary placeholder:text-primary outline-none"
+                  onChange={(e) =>
+                    setUser({ ...user, countryCode: e.target.value })
+                  }
+                >
+                  <option value="">--</option>
                   <option value="+1">🇺🇸 +1</option>
                   <option value="+1CA">🇨🇦 +1</option>
                   <option value="+44">🇬🇧 +44</option>
@@ -232,13 +273,21 @@ function StepOneBottom({
                   <option value="+263">🇿🇼 +263</option>
                 </select>
                 <input
-                  type="text"
+                  name="phone"
                   placeholder="(404) 291-4982"
+                  onChange={(e) =>
+                    setUser({
+                      ...user,
+                      phone: e.target.value,
+                    })
+                  }
                   className="rounded-3xl bg-white p-2 px-4 w-full text-primary placeholder:text-[#7E7E7E] outline-none"
                 />
               </div>
               <button
-                onClick={() => setStep(3)}
+                onClick={() => {
+                  handleCreateUser();
+                }}
                 className="bg-[#191919CC] text-white rounded-3xl py-3 px-4 w-full font-semibold"
               >
                 Continue
@@ -260,11 +309,19 @@ function StepOneBottom({
                 Enter the verification code we just sent to [EMAIL]
               </p>
               <input
+                name="code"
+                onChange={(e) => setCode(e.target.value)}
                 placeholder="123456"
                 className="rounded-3xl bg-white p-2 px-4 w-full text-primary placeholder:text-[#7E7E7E] placeholder:text-center outline-none my-4"
               />
               <button
-                onClick={() => setStep(4)}
+                onClick={() => {
+                  if (code === "123456") {
+                    setStep(4);
+                  } else {
+                    alert("Invalid code");
+                  }
+                }}
                 className="bg-[#191919CC] text-white rounded-3xl py-3 px-4 w-full font-semibold"
               >
                 Continue
@@ -275,6 +332,8 @@ function StepOneBottom({
             <GenerateLinkButton
               linkGenerated={linkGenerated}
               setLinkGenerated={setLinkGenerated}
+              handleCreateBubble={handleCreateBubble}
+              tokens={tokens}
             />
           ),
         }[step]
