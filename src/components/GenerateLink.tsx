@@ -1,35 +1,32 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import copyIcon from "../assets/copy.svg";
 
 const GenerateLinkButton = ({
   linkGenerated,
   handleCreateBubble,
   setLinkGenerated,
-  tokens,
 }: {
   linkGenerated: boolean;
-  handleCreateBubble: () => void;
+  handleCreateBubble: () => Promise<{ bubbleId: string | null }>;
   setLinkGenerated: React.Dispatch<React.SetStateAction<boolean>>;
-  tokens: string[];
 }) => {
   const [disabledState, setDisabledState] = useState(false);
   const [generatedLink, setGeneratedLink] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
 
-  useEffect(() => {
-    if (tokens.length > 0) {
-      const newLink = "https://typo.inc/";
-      const concatenatedLink = newLink + tokens[0];
-      setGeneratedLink(concatenatedLink);
-    }
-  }, [tokens]); // Watch for changes in tokens array
-
   const handleButtonClick = async () => {
     setIsGenerating(true);
     setDisabledState(true);
     try {
-      await handleCreateBubble();
-      setLinkGenerated(true); // Ensure this is updated after the bubble is created
+      // Call handleCreateBubble and get the bubbleId
+      const { bubbleId } = await handleCreateBubble();
+      if (bubbleId) {
+        const newLink = `https://typo.inc/${bubbleId}`;
+        setGeneratedLink(newLink); // Set the generated link with bubbleId
+        setLinkGenerated(true); // Ensure this is updated after the bubble is created
+      } else {
+        console.error("Bubble ID not available");
+      }
     } catch (error) {
       console.error("Error creating bubble:", error);
     } finally {

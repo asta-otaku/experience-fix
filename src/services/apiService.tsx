@@ -43,12 +43,12 @@ export const uploadFiles = async (files: File[]): Promise<any> => {
 export const createBubble = async (
   content: string,
   tokenIds: string[],
-  email: string
+  phone: string
 ): Promise<any> => {
   const bubbleData = {
     content,
     tokens: tokenIds,
-    createdByEmail: email,
+    createdByPhone: phone,
   };
 
   try {

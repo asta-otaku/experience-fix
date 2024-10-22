@@ -11,15 +11,16 @@ function StepOneBottom({
   step,
   setStep,
   setLinkGenerated,
-  tokens,
+  setUserPhone,
 }: {
   disabledState: boolean;
   linkGenerated: boolean;
-  handleCreateBubble: () => void;
+  handleCreateBubble: () => Promise<{ bubbleId: string | null }>;
   step: number;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   setLinkGenerated: React.Dispatch<React.SetStateAction<boolean>>;
   tokens: string[];
+  setUserPhone: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const [user, setUser] = useState({
     name: "",
@@ -37,6 +38,7 @@ function StepOneBottom({
         phone: user.countryCode + user.phone,
       });
       if (res) {
+        setUserPhone(user.countryCode + user.phone);
         setStep(3);
       }
     } catch (error) {
@@ -306,7 +308,7 @@ function StepOneBottom({
                 Enter verification code
               </h2>
               <p className="text-[#7E7E7E] text-[15px] text-center">
-                Enter the verification code we just sent to [EMAIL]
+                Enter the verification code we just sent to your phone number
               </p>
               <input
                 name="code"
@@ -333,7 +335,6 @@ function StepOneBottom({
               linkGenerated={linkGenerated}
               setLinkGenerated={setLinkGenerated}
               handleCreateBubble={handleCreateBubble}
-              tokens={tokens}
             />
           ),
         }[step]
