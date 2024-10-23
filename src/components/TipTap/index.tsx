@@ -203,8 +203,7 @@ const App = () => {
 
   return (
     <div className="w-full min-h-screen flex justify-center items-center flex-col py-16 relative p-4">
-      <div className="flex flex-col gap-6 self-stretch md:self-auto w-[360px] items-start mx-auto p-6 mt-6">
-        <input type="file" multiple onChange={handleFileUpload} />
+      <div className="flex flex-col gap-6 w-[360px] items-end mx-auto p-6">
         <TextBubble
           ref={textBubbleRef}
           selectedFiles={selectedFiles}
