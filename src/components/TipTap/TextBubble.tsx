@@ -10,7 +10,7 @@ import { Paragraph } from "@tiptap/extension-paragraph";
 import { FileTokenNode } from "./fileTokenExtenstion";
 import "../TextBubble.css";
 import doc from "../../assets/doc.svg";
-// import loader from "../../assets/loader.svg";
+import loader from "../../assets/loader.svg";
 import PreviewBox from "./PreviewBox";
 
 interface FileData {
@@ -22,6 +22,7 @@ interface TextBubbleProps {
   selectedFiles: FileData[];
   setSelectedFiles: React.Dispatch<React.SetStateAction<FileData[]>>;
   linkGenerated: boolean;
+  isGenerating: boolean;
   setDisabledState: React.Dispatch<React.SetStateAction<boolean>>;
   step: number;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -48,6 +49,7 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
   const {
     selectedFiles,
     linkGenerated,
+    isGenerating,
     setDisabledState,
     step,
     handleFileUpload,
@@ -221,12 +223,16 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
           {step >= 2 && !linkGenerated && (
             <>
               <div className="absolute inset-0 bg-black/50 opacity-30 rounded-lg"></div>
-              {/* <div className="absolute inset-0 flex items-center justify-center">
-                <img src={loader} alt="Loader" className="w-full" />
-              </div> */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <img
+                  src={loader}
+                  alt="Loader"
+                  className={`w-full ${isGenerating ? "block" : "hidden"}`}
+                />
+              </div>
               <div className="flex w-full justify-center">
                 <p className="text-white text-xs absolute bottom-4 text-center w-[150px] bg-[#19191980] py-1 px-2 rounded-full">
-                  {formattedFileSize} Uploaded
+                  {formattedFileSize} {isGenerating ? "Uploading" : "Selected"}
                 </p>
               </div>
             </>

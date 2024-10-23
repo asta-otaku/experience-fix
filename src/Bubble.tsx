@@ -159,9 +159,9 @@ function Bubble() {
   }
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center flex-col pb-16 relative">
-      <div className="w-[345px] mx-auto">
-        <article className="bg-gradient-to-b from-[#3076FF] overflow-hidden to-[#1D49E5] text-[17px] pt-3 rounded-2xl">
+    <div className="w-full min-h-screen flex justify-center items-center flex-col py-16 relative p-4">
+      <div className="flex flex-col gap-6 w-[360px] items-end mx-auto p-6">
+        <article className="bg-gradient-to-b from-[#3076FF] overflow-hidden to-[#1D49E5] w-full text-[17px] pt-3 rounded-2xl">
           <div className="px-3 font-light text-white whitespace-pre-wrap break-words">
             {renderContent(bubbleData.content, bubbleData.tokens)}
           </div>

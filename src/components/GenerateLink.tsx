@@ -3,16 +3,19 @@ import copyIcon from "../assets/copy.svg";
 
 const GenerateLinkButton = ({
   linkGenerated,
+  isGenerating,
   handleCreateBubble,
   setLinkGenerated,
+  setIsGenerating,
 }: {
   linkGenerated: boolean;
+  isGenerating: boolean;
   handleCreateBubble: () => Promise<{ bubbleId: string | null }>;
   setLinkGenerated: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [disabledState, setDisabledState] = useState(false);
   const [generatedLink, setGeneratedLink] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleButtonClick = async () => {
     setIsGenerating(true);

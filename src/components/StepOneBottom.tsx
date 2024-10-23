@@ -7,19 +7,22 @@ import { createUser } from "../services/apiService";
 function StepOneBottom({
   disabledState,
   linkGenerated,
+  isGenerating,
   handleCreateBubble,
   step,
   setStep,
+  setIsGenerating,
   setLinkGenerated,
   setUserPhone,
 }: {
   disabledState: boolean;
   linkGenerated: boolean;
+  isGenerating: boolean;
   handleCreateBubble: () => Promise<{ bubbleId: string | null }>;
   step: number;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   setLinkGenerated: React.Dispatch<React.SetStateAction<boolean>>;
-  tokens: string[];
+  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>;
   setUserPhone: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const [user, setUser] = useState({
@@ -333,6 +336,8 @@ function StepOneBottom({
           4: (
             <GenerateLinkButton
               linkGenerated={linkGenerated}
+              isGenerating={isGenerating}
+              setIsGenerating={setIsGenerating}
               setLinkGenerated={setLinkGenerated}
               handleCreateBubble={handleCreateBubble}
             />

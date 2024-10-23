@@ -41,8 +41,6 @@ const App = () => {
     }
   };
 
-  const [tokens, setTokens] = useState<string[]>([]);
-
   const handleDragOver = (event: DragEvent) => {
     event.preventDefault();
   };
@@ -59,6 +57,7 @@ const App = () => {
 
   const [step, setStep] = useState(0);
   const [linkGenerated, setLinkGenerated] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -186,7 +185,6 @@ const App = () => {
         uniqueTokens.map((token: any) => token._id),
         userPhone
       );
-      setTokens(uniqueTokens.map((token: any) => token._id));
       console.log("Bubble created successfully:", createdBubble);
 
       // Return the bubbleId from the created bubble response
@@ -207,6 +205,7 @@ const App = () => {
           setDisabledState={setDisabledState}
           linkGenerated={linkGenerated}
           handleFileUpload={handleFileUpload}
+          isGenerating={isGenerating}
           step={step}
         />
       </div>
@@ -217,8 +216,9 @@ const App = () => {
         linkGenerated={linkGenerated}
         setLinkGenerated={setLinkGenerated}
         handleCreateBubble={handleCreateBubble}
-        tokens={tokens}
         setUserPhone={setUserPhone}
+        isGenerating={isGenerating}
+        setIsGenerating={setIsGenerating}
       />
     </div>
   );
