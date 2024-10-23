@@ -21,7 +21,8 @@ const GenerateLinkButton = ({
       // Call handleCreateBubble and get the bubbleId
       const { bubbleId } = await handleCreateBubble();
       if (bubbleId) {
-        const newLink = `https://typo.inc/${bubbleId}`;
+        const frontendBaseUrl = import.meta.env.VITE_FRONTEND_BASE_URL;
+        const newLink = `${frontendBaseUrl}/bubble/${bubbleId}`;
         setGeneratedLink(newLink); // Set the generated link with bubbleId
         setLinkGenerated(true); // Ensure this is updated after the bubble is created
       } else {

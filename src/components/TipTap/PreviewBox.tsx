@@ -96,18 +96,18 @@ function PreviewBox({ file }: { file: File | null }) {
         )}
 
       {/* Display file name */}
-      <div className="text-sm font-semibold text-[#191919] mt-2">
+      {/* <div className="text-sm font-semibold text-[#191919] mt-2">
         {fileName}
-      </div>
+      </div> */}
 
       {/* Provide option to download or view the file */}
-      <a
+      {/* <a
         href={fileURL}
         download={fileName}
         className="p-2 bg-[#007bff] text-white text-center rounded-lg no-underline cursor-pointer mt-3 text-sm hover:bg-[#0056b3]"
       >
         Download
-      </a>
+      </a> */}
     </div>
   );
 }

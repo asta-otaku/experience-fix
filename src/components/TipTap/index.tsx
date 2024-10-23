@@ -189,10 +189,6 @@ const App = () => {
       setTokens(uniqueTokens.map((token: any) => token._id));
       console.log("Bubble created successfully:", createdBubble);
 
-      // Clear the selected files and created tokens
-      setSelectedFiles([]);
-      setCreatedTokens([]);
-
       // Return the bubbleId from the created bubble response
       return { bubbleId: createdBubble._id };
     } catch (error) {
