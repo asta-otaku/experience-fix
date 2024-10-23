@@ -76,7 +76,8 @@ function Bubble() {
               : "bg-[#FFFFFF33] text-white"
           }`}
         >
-          <span className="max-w-[150px] w-full truncate">
+          <span>📄</span>
+          <span className="text-inherit max-w-14 w-full truncate">
             {token.fileName}
           </span>
         </button>
