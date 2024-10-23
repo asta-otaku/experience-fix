@@ -314,7 +314,7 @@ function StepOneBottom({
                 name="code"
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="123456"
-                className="rounded-3xl bg-white p-2 px-4 w-full text-primary placeholder:text-[#7E7E7E] placeholder:text-center outline-none my-4"
+                className="rounded-3xl bg-white p-2 px-4 w-full text-primary placeholder:text-[#7E7E7E] text-center placeholder:text-center outline-none my-4"
               />
               <button
                 onClick={() => {

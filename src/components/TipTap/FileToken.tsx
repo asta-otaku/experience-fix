@@ -1,5 +1,6 @@
 import React from "react";
 import { NodeViewWrapper } from "@tiptap/react";
+
 interface FileTokenProps {
   node: any;
   selected: boolean; // This comes from TipTap's NodeViewProps
@@ -7,6 +8,41 @@ interface FileTokenProps {
 
 const FileTokenComponent: React.FC<FileTokenProps> = ({ node, selected }) => {
   const { fileName } = node.attrs;
+
+  // Function to get the file extension
+  const getFileExtension = (fileName: string) => {
+    return fileName.split(".").pop()?.toLowerCase();
+  };
+
+  // Function to render the appropriate icon based on the file extension
+  const renderIcon = (fileExtension: string | undefined) => {
+    switch (fileExtension) {
+      case "zip":
+      case "rar":
+        return "📦"; // Icon for zip files
+      case "mp3":
+      case "wav":
+      case "ogg":
+        return "🎵"; // Icon for audio files
+      case "mp4":
+      case "avi":
+      case "mkv":
+        return "🎥"; // Icon for video files
+      case "pdf":
+      case "doc":
+      case "docx":
+        return "📄"; // Icon for document files
+      case "xls":
+      case "xlsx":
+        return "📊"; // Icon for Excel files
+      case "csv":
+        return "📑"; // Icon for CSV files
+      default:
+        return "📄"; // Default icon for unknown file types
+    }
+  };
+
+  const fileExtension = getFileExtension(fileName);
 
   return (
     <NodeViewWrapper
@@ -18,7 +54,8 @@ const FileTokenComponent: React.FC<FileTokenProps> = ({ node, selected }) => {
       }}
     >
       <span className="flex gap-1 items-center">
-        <span>📄</span> {/* Icon for file */}
+        {/* Render appropriate icon based on file type */}
+        <span>{renderIcon(fileExtension)}</span>
         <span className="text-inherit max-w-14 w-full truncate">
           {fileName}
         </span>

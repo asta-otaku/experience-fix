@@ -47,11 +47,9 @@ function Bubble() {
   }, [slug]);
 
   const renderContent = (content: string, tokens: Token[]) => {
-    let currentTokenIndex = 0;
     const elements: JSX.Element[] = [];
     let currentText = "";
 
-    // Function to add accumulated text
     const addText = (text: string, index: number) => {
       if (text) {
         elements.push(
@@ -64,8 +62,38 @@ function Bubble() {
       }
     };
 
-    // Function to add token button
-    const addToken = (token: Token, index: number) => {
+    const getFileIcon = (fileName: string) => {
+      const fileExtension = fileName.split(".").pop()?.toLowerCase();
+      switch (fileExtension) {
+        case "zip":
+        case "rar":
+          return "📦";
+        case "mp3":
+        case "wav":
+        case "ogg":
+          return "🎵";
+        case "mp4":
+        case "avi":
+        case "mkv":
+          return "🎥";
+        case "pdf":
+        case "doc":
+        case "docx":
+          return "📄";
+        case "xls":
+        case "xlsx":
+          return "📊";
+        case "csv":
+          return "📑";
+        default:
+          return "📄";
+      }
+    };
+
+    const addToken = (tokenId: string, index: number) => {
+      const token = tokens.find((t) => t._id === tokenId);
+      if (!token) return;
+
       elements.push(
         <button
           key={`token-${token._id}-${index}`}
@@ -76,7 +104,7 @@ function Bubble() {
               : "bg-[#FFFFFF33] text-white"
           }`}
         >
-          <span>📄</span>
+          <span>{getFileIcon(token.fileName)}</span>
           <span className="text-inherit max-w-14 w-full truncate">
             {token.fileName}
           </span>
@@ -84,27 +112,31 @@ function Bubble() {
       );
     };
 
-    // Process the content by handling <p> and <file> tags
     const processContent = () => {
-      // Replace <p> and </p> with empty strings to handle it as inline
+      // Remove <p> tags
       content = content.replace(/<\/?p>/g, "");
 
       let i = 0;
       while (i < content.length) {
-        if (content.slice(i).startsWith("<file>")) {
-          // Add the accumulated text before encountering a file token
+        if (content.slice(i).startsWith("<file-token")) {
+          // Add accumulated text before the token
           addText(currentText, i);
           currentText = "";
 
-          i += "<file>".length;
-          const closeIndex = content.indexOf("</file-token>", i);
-          if (closeIndex !== -1 && currentTokenIndex < tokens.length) {
-            addToken(tokens[currentTokenIndex], currentTokenIndex);
-            currentTokenIndex++;
-            i = closeIndex + "</file-token>".length;
+          // Find the end of the token tag
+          const closeIndex = content.indexOf(">", i);
+          if (closeIndex !== -1) {
+            // Extract the token ID
+            const idMatch = content.slice(i, closeIndex).match(/id="([^"]+)"/);
+            if (idMatch) {
+              addToken(idMatch[1], elements.length);
+            }
+            // Move past the closing tag
+            const tokenEndIndex = content.indexOf("</file-token>", closeIndex);
+            i = tokenEndIndex + "</file-token>".length;
           } else {
-            currentText += "<file>";
-            i += "<file>".length;
+            currentText += content[i];
+            i++;
           }
         } else {
           currentText += content[i];
@@ -114,7 +146,7 @@ function Bubble() {
 
       // Add any remaining text
       if (currentText) {
-        addText(currentText, i);
+        addText(currentText, elements.length);
       }
     };
 

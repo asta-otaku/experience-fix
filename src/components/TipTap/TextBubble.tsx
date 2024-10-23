@@ -27,6 +27,23 @@ interface TextBubbleProps {
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+const formatFileSize = (sizeInBytes: number): string => {
+  const sizeInGB = sizeInBytes / (1024 * 1024 * 1024);
+  if (sizeInGB >= 1) {
+    return `${sizeInGB.toFixed(2)} GB`;
+  } else {
+    const sizeInMB = sizeInBytes / (1024 * 1024);
+    return `${sizeInMB.toFixed(2)} MB`;
+  }
+};
+
+const calculateCumulativeFileSize = (files: FileData[]): number => {
+  return files.reduce(
+    (totalSize, fileData) => totalSize + fileData.file.size,
+    0
+  );
+};
+
 const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
   const {
     selectedFiles,
@@ -157,6 +174,10 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
     event.stopPropagation();
   };
 
+  // Calculate the total file size of all selected files
+  const totalFileSize = calculateCumulativeFileSize(selectedFiles);
+  const formattedFileSize = formatFileSize(totalFileSize);
+
   return (
     <div
       className={`w-full h-full trunc rounded-2xl pb-2 -translate-y-16 relative ${
@@ -205,7 +226,7 @@ const TextBubble = React.forwardRef((props: TextBubbleProps, ref) => {
               </div>
               <div className="flex w-full justify-center">
                 <p className="text-white text-xs absolute bottom-4 text-center w-[150px] bg-[#19191980] py-1 px-2 rounded-full">
-                  1.9GB/2GB Uploaded
+                  {formattedFileSize} Uploaded
                 </p>
               </div>
             </>
