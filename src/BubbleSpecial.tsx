@@ -38,7 +38,6 @@ const BubbleSpecial = () => {
   const [bubbleData, setBubbleData] = useState<BubbleData | null>(null);
   const [selectedAttachment, setSelectedAttachment] =
     useState<Attachment | null>(null);
-  const [s3Url, setS3Url] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBubbleData = async () => {
@@ -65,7 +64,6 @@ const BubbleSpecial = () => {
         ) {
           setBubbleData(artifact);
           setSelectedAttachment(artifact.attachments[0]);
-          setS3Url(artifact.attachments[0].content.s3Url);
         } else {
           console.error("No attachments found in the response");
         }
@@ -78,14 +76,6 @@ const BubbleSpecial = () => {
       fetchBubbleData();
     }
   }, [slug]);
-
-  useEffect(() => {
-    if (selectedAttachment) {
-      setS3Url(selectedAttachment.content.s3Url || null);
-    }
-  }, [selectedAttachment]);
-
-  console.log(s3Url);
 
   const renderContent = (content: string, attachments: Attachment[]) => {
     if (!content) return <p>No content available</p>;
