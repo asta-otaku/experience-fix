@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import TokenPreview from "./components/TokenPreview";
+import { truncateFilename } from "./components/TruncateText";
 
 interface Token {
   _id: string;
@@ -105,8 +106,8 @@ function Bubble() {
           }`}
         >
           <span>{getFileIcon(token.fileName)}</span>
-          <span className="text-inherit max-w-14 w-full truncate">
-            {token.fileName}
+          <span className="text-inherit max-w-20 w-full truncate">
+            {truncateFilename(token.fileName)}
           </span>
         </button>
       );

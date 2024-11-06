@@ -1,5 +1,6 @@
 import React from "react";
 import { NodeViewWrapper } from "@tiptap/react";
+import { truncateFilename } from "../TruncateText";
 
 interface FileTokenProps {
   node: any;
@@ -56,8 +57,8 @@ const FileTokenComponent: React.FC<FileTokenProps> = ({ node, selected }) => {
       <span className="flex gap-1 items-center">
         {/* Render appropriate icon based on file type */}
         <span>{renderIcon(fileExtension)}</span>
-        <span className="text-inherit max-w-14 w-full truncate">
-          {fileName}
+        <span className="text-inherit max-w-20 w-full truncate">
+          {truncateFilename(fileName)}
         </span>
       </span>
     </NodeViewWrapper>

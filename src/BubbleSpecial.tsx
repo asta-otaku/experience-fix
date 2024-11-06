@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import TokenPreviewSpecial from "./components/TokenPreviewSpecial";
-
+import { truncateFilename } from "./components/TruncateText";
+import imageIcon from "./assets/imageIcon.svg";
+import videoIcon from "./assets/videoIcon.svg";
+import audioIcon from "./assets/musicIcon.svg";
+import links from "./assets/chain.svg";
+import whitelinks from "./assets/whitechain.svg";
 // Define the attachment types for the Special Bubble
 interface AttachmentContent {
   url?: string;
@@ -36,6 +41,7 @@ const USER_ID = import.meta.env.VITE_USER_ID;
 const BubbleSpecial = () => {
   const { slug } = useParams<{ slug: string }>();
   const [bubbleData, setBubbleData] = useState<BubbleData | null>(null);
+  const [owner, setOwner] = useState<string>("");
   const [selectedAttachment, setSelectedAttachment] =
     useState<Attachment | null>(null);
 
@@ -55,6 +61,7 @@ const BubbleSpecial = () => {
 
         // Access the 'artifact' object from the response
         const artifact = response.data.artifact;
+        setOwner(response.data.ownerProfile.displayName);
 
         // Check if 'artifact.attachments' exists and is an array
         if (
@@ -121,11 +128,11 @@ const BubbleSpecial = () => {
       case "mp3":
       case "wav":
       case "ogg":
-        return "🎵";
+        return <img src={audioIcon} alt="audio icon" className="w-4 h-4" />;
       case "mp4":
       case "avi":
       case "mkv":
-        return "🎥";
+        return <img src={videoIcon} alt="video icon" className="w-4 h-4" />;
       case "pdf":
       case "doc":
       case "docx":
@@ -135,6 +142,12 @@ const BubbleSpecial = () => {
         return "📊";
       case "csv":
         return "📑";
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "gif":
+      case "heic":
+        return <img src={imageIcon} alt="image icon" className="w-4 h-4" />;
       case "link":
         return "🔗";
       default:
@@ -145,6 +158,14 @@ const BubbleSpecial = () => {
   const renderAttachment = (attachment: Attachment, index: number) => {
     switch (attachment.type) {
       case "LINK":
+        const url = new URL(attachment.content.url || "");
+        const isTwitterLink =
+          url.hostname.includes("twitter.com") ||
+          url.hostname.includes("x.com");
+        const displayText = isTwitterLink
+          ? "twitter.com"
+          : truncateFilename(url.hostname.replace("www.", ""));
+
         return (
           <button
             key={`attachment-${attachment.content.id}-${index}`}
@@ -157,9 +178,18 @@ const BubbleSpecial = () => {
                 : "bg-[#FFFFFF33] text-white"
             }`}
           >
-            <span>🔗</span>
-            <span className="text-inherit max-w-14 w-full truncate">
-              {new URL(attachment.content.url || "").hostname}
+            <span>
+              <img
+                src={
+                  selectedAttachment?.content.id === attachment.content.id
+                    ? links
+                    : whitelinks
+                }
+                alt="link icon"
+              />
+            </span>
+            <span className="text-inherit max-w-20 w-full truncate">
+              {displayText}
             </span>
           </button>
         );
@@ -175,8 +205,8 @@ const BubbleSpecial = () => {
             }`}
           >
             <span>{getFileIcon(attachment.content.name || "")}</span>
-            <span className="text-inherit max-w-14 w-full truncate">
-              {attachment.content.name}
+            <span className="text-inherit max-w-20 w-full truncate">
+              {truncateFilename(attachment.content.name || "")}
             </span>
           </button>
         );
@@ -227,14 +257,14 @@ const BubbleSpecial = () => {
 
   return (
     <div className="w-full min-h-screen flex justify-center items-center flex-col py-16 relative p-4">
-      <div className="flex flex-col gap-6 w-[360px] items-end mx-auto p-6">
+      <div className="flex flex-col w-[360px] mx-auto p-6">
         <article className="bg-gradient-to-b from-[#3076FF] overflow-hidden to-[#1D49E5] w-full text-[17px] pt-3 rounded-2xl">
           <div className="px-3 font-light text-white whitespace-pre-wrap break-words">
             {renderContent(bubbleData.contentText, bubbleData.attachments)}
           </div>
 
           <div className="bubble-bottom mt-2 w-full">
-            {selectedAttachment && selectedAttachment.content.url && (
+            {selectedAttachment && (
               <TokenPreviewSpecial
                 token={{
                   ...selectedAttachment,
@@ -245,6 +275,7 @@ const BubbleSpecial = () => {
             )}
           </div>
         </article>
+        <h2 className="text-[#7E7E7E] text-xs mt-1">{owner}</h2>
       </div>
     </div>
   );
