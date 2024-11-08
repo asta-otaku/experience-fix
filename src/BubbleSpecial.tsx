@@ -6,6 +6,7 @@ import { truncateFilename } from "./components/TruncateText";
 import imageIcon from "./assets/imageIcon.svg";
 import videoIcon from "./assets/videoIcon.svg";
 import audioIcon from "./assets/musicIcon.svg";
+import blueAudio from "./assets/blueMusicIcon.svg";
 import links from "./assets/chain.svg";
 import whitelinks from "./assets/whitechain.svg";
 // Define the attachment types for the Special Bubble
@@ -81,17 +82,8 @@ const BubbleSpecial = () => {
         const artifact = response.data.artifact;
         setOwner(response.data.ownerProfile.displayName);
 
-        // Check if 'artifact.attachments' exists and is an array
-        if (
-          artifact.attachments &&
-          Array.isArray(artifact.attachments) &&
-          artifact.attachments.length > 0
-        ) {
-          setBubbleData(artifact);
-          setSelectedAttachment(artifact.attachments[0]);
-        } else {
-          console.error("No attachments found in the response");
-        }
+        setBubbleData(artifact);
+        setSelectedAttachment(artifact.attachments[0]);
       } catch (error) {
         console.error("Error fetching bubble data", error);
       }
@@ -137,7 +129,7 @@ const BubbleSpecial = () => {
     return elements;
   };
 
-  const getFileIcon = (fileName: string) => {
+  const getFileIcon = (fileName: string, attachment: Attachment) => {
     const fileExtension = fileName.split(".").pop()?.toLowerCase();
     switch (fileExtension) {
       case "zip":
@@ -146,7 +138,17 @@ const BubbleSpecial = () => {
       case "mp3":
       case "wav":
       case "ogg":
-        return <img src={audioIcon} alt="audio icon" className="w-4 h-4" />;
+        return (
+          <img
+            src={
+              selectedAttachment?.content.id === attachment.content.id
+                ? blueAudio
+                : audioIcon
+            }
+            alt="audio icon"
+            className="w-4 h-4"
+          />
+        );
       case "mp4":
       case "avi":
       case "mkv":
@@ -225,7 +227,9 @@ const BubbleSpecial = () => {
                 : "bg-[#FFFFFF33] text-white"
             }`}
           >
-            <span>{getFileIcon(attachment.content.name || "")}</span>
+            <span>
+              {getFileIcon(attachment.content.name || "", attachment)}
+            </span>
             <span className="text-inherit max-w-20 w-full truncate">
               {truncateFilename(attachment.content.name || "")}
             </span>

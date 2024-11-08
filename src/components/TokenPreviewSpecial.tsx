@@ -100,7 +100,6 @@ function TokenPreviewSpecial({ token }: { token: AttachmentContent }) {
   };
 
   const renderLinkPreview = () => {
-    if (!token.metaData) return null;
     const { hostname } = getDisplayUrl(token.content?.url || "");
 
     return (
@@ -110,8 +109,7 @@ function TokenPreviewSpecial({ token }: { token: AttachmentContent }) {
             <div className="w-6 h-6 rounded border border-solid border-[#1919191a] flex items-center justify-center">
               {!faviconError ? (
                 <img
-                  // src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`}
-                  src={token.metaData.faviconUrl}
+                  src={token.metaData?.faviconUrl || fallback}
                   alt="Site favicon"
                   className="w-full h-full object-contain"
                   onError={() => setFaviconError(true)}
@@ -138,12 +136,12 @@ function TokenPreviewSpecial({ token }: { token: AttachmentContent }) {
           </a>
         </div>
         <h2 className="text-[#7e7e7e] text-sm line-clamp-1">
-          {token.metaData.title}
+          {token.metaData?.title}
         </h2>
         <p className="inline-block self-stretch text-[#7e7e7e] text-sm">
-          {token.metaData.dataText}
+          {token.metaData?.dataText}
         </p>
-        {token.metaData.mediaUrl && (
+        {token.metaData?.mediaUrl && (
           <a
             href={url}
             className="max-w-xs max-h-[175px] rounded-lg cursor-pointer relative group"
