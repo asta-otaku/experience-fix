@@ -20,9 +20,23 @@ interface AttachmentContent {
   startTime?: number;
 }
 
+interface MetaDataContent {
+  username: null | string;
+  avatarUrl: null | string;
+  mediaUrl: string;
+  faviconUrl: string;
+  dataText: string;
+  title: string;
+  fileType: number;
+  size: null | number;
+  streamAudioUrl: string;
+}
+
 interface Attachment {
   index: number;
   type: "LINK" | "FILE" | "SYSTEM_MESSAGE" | "USER" | "TIMESTAMP" | "REFERENCE";
+  s3DownloadLink: string;
+  metaData: null | MetaDataContent;
   content: AttachmentContent;
 }
 
@@ -49,8 +63,12 @@ const BubbleSpecial = () => {
     const fetchBubbleData = async () => {
       try {
         // Make the Axios request with the x-user-id header
-        const response = await axios.get(
-          `${SPECIAL_BUBBLE_BASE_URL}/api/artifacts/${slug}/details`,
+        const response = await axios.post(
+          `${SPECIAL_BUBBLE_BASE_URL}/api/artifacts/details`,
+          {
+            artifactId: slug,
+            isDev: true,
+          },
           {
             headers: {
               "x-user-id": USER_ID, // Use the user ID from the environment variable
@@ -162,8 +180,11 @@ const BubbleSpecial = () => {
         const isTwitterLink =
           url.hostname.includes("twitter.com") ||
           url.hostname.includes("x.com");
+        const isSpotifyLink = url.hostname.includes("spotify.com");
         const displayText = isTwitterLink
           ? "twitter.com"
+          : isSpotifyLink
+          ? "spotify.com"
           : truncateFilename(url.hostname.replace("www.", ""));
 
         return (
@@ -268,7 +289,7 @@ const BubbleSpecial = () => {
               <TokenPreviewSpecial
                 token={{
                   ...selectedAttachment,
-                  url: selectedAttachment.content.url,
+                  url: selectedAttachment.s3DownloadLink,
                   name: selectedAttachment.content.name || "Unnamed File", // Ensure fileName is always a string
                 }}
               />

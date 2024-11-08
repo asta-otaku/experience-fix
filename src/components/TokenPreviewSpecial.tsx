@@ -2,17 +2,31 @@ import { useState, useRef, useEffect } from "react";
 import updown from "../assets/updown.svg";
 import fallback from "../assets/fallbackLinkImage.svg";
 
+interface MetaDataContent {
+  username: null | string;
+  avatarUrl: null | string;
+  mediaUrl: string;
+  faviconUrl: string;
+  dataText: string;
+  title: string;
+  fileType: number;
+  size: null | number;
+  streamAudioUrl: string;
+}
 interface AttachmentContent {
   url?: string;
   name?: string;
   type: string;
   id?: string;
+  index: number;
+  s3DownloadLink: null | string;
+  metaData: null | MetaDataContent;
   content?: {
     name?: string;
-    s3Url?: string;
     size?: number;
     height?: number | null;
     thumbnailImage?: string | null;
+    url?: string;
   };
 }
 
@@ -86,8 +100,8 @@ function TokenPreviewSpecial({ token }: { token: AttachmentContent }) {
   };
 
   const renderLinkPreview = () => {
-    if (!url) return null;
-    const { hostname } = getDisplayUrl(url);
+    if (!token.metaData) return null;
+    const { hostname } = getDisplayUrl(token.content?.url || "");
 
     return (
       <div className="flex max-w-xs w-full p-3 flex-col gap-3 rounded-[14px] bg-white border border-solid border-[#1919191a]">
@@ -96,7 +110,8 @@ function TokenPreviewSpecial({ token }: { token: AttachmentContent }) {
             <div className="w-6 h-6 rounded border border-solid border-[#1919191a] flex items-center justify-center">
               {!faviconError ? (
                 <img
-                  src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`}
+                  // src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`}
+                  src={token.metaData.faviconUrl}
                   alt="Site favicon"
                   className="w-full h-full object-contain"
                   onError={() => setFaviconError(true)}
@@ -114,52 +129,48 @@ function TokenPreviewSpecial({ token }: { token: AttachmentContent }) {
             </div>
           </div>
           <a
-            href={url}
+            href={token.content?.url}
             target="_blank"
             rel="noopener noreferrer"
             className="bg-transparent border border-solid border-[#1919191A] text-xs text-[#191919] px-2 py-1 rounded-full"
           >
-            Visit Link
+            {hostname.includes("twitter.com") ? "Visit Tweet" : "Visit Link"}
           </a>
         </div>
-        <div className="inline-block self-stretch text-[#7e7e7e] max-w-xs truncate overflow-hidden text-sm">
-          This could be an interesting website with a lot of useful information.
-          Click the button below to visit the site and explore more.
-        </div>
-        <a
-          href={url}
-          className="max-w-xs max-h-[175px] rounded-lg cursor-pointer relative group"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {token?.content?.s3Url ? (
+        <h2 className="text-[#7e7e7e] text-sm line-clamp-1">
+          {token.metaData.title}
+        </h2>
+        <p className="inline-block self-stretch text-[#7e7e7e] text-sm">
+          {token.metaData.dataText}
+        </p>
+        {token.metaData.mediaUrl && (
+          <a
+            href={url}
+            className="max-w-xs max-h-[175px] rounded-lg cursor-pointer relative group"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <img
-              src={token.content.s3Url}
+              src={token.metaData.mediaUrl}
               alt={`${hostname} Preview`}
               className="h-[175px] w-full rounded-lg object-cover border border-solid border-[#1919191a] transition-opacity group-hover:opacity-90"
             />
-          ) : (
-            <div className="h-[175px] w-full rounded-lg border border-solid border-[#1919191a] bg-gray-50 flex flex-col items-center justify-center gap-2 transition-colors group-hover:bg-gray-100">
-              <span className="flex items-center justify-center w-full h-full text-7xl">
-                🌐
-              </span>
-            </div>
-          )}
-        </a>
+          </a>
+        )}
       </div>
     );
   };
 
   const renderFilePreview = () => {
-    const fileUrl = token.content?.s3Url || url;
+    const fileUrl = url;
     const fileSize = formatFileSize(token.content?.size);
 
     // Image Preview - Just the image
-    if (isImage && token.content?.s3Url) {
+    if (isImage && url) {
       return (
         <div className="max-w-xs w-full overflow-hidden rounded-[14px]">
           <img
-            src={token?.content?.s3Url ?? token.content.thumbnailImage}
+            src={url}
             alt={filename}
             className="w-full min-h-[175px] object-cover"
           />
