@@ -1,4 +1,5 @@
 import updown from "../assets/updown.svg";
+import AudioPlayer from "./AudioPlayer";
 
 function RenderFilePreview({
   url,
@@ -10,8 +11,6 @@ function RenderFilePreview({
   isVideo,
   fileExtension,
   isAudio,
-  audioRef,
-  audioDuration,
   isPDF,
   isZip,
   isCSV,
@@ -27,8 +26,6 @@ function RenderFilePreview({
   isVideo: boolean;
   fileExtension: string;
   isAudio: boolean;
-  audioRef: React.RefObject<HTMLAudioElement>;
-  audioDuration: string;
   isPDF: boolean;
   isZip: boolean;
   isCSV: boolean;
@@ -75,7 +72,13 @@ function RenderFilePreview({
   if (isAudio && fileUrl) {
     return (
       <ContentWrapper>
-        <div className="max-w-xs w-full p-3 flex flex-col gap-3 rounded-[14px] bg-white border border-solid border-[#1919191a]">
+        <AudioPlayer
+          audioUrl={fileUrl}
+          filename={filename}
+          fileSize={fileSize}
+          updownIcon={updown}
+        />
+        {/* <div className="max-w-xs w-full p-3 flex flex-col gap-3 rounded-[14px] bg-white border border-solid border-[#1919191a]">
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium max-w-40 truncate text-[#191919]">
               {filename}
@@ -90,7 +93,7 @@ function RenderFilePreview({
             <source src={fileUrl} type={`audio/${fileExtension}`} />
             Your browser does not support the audio element.
           </audio>
-        </div>
+        </div> */}
       </ContentWrapper>
     );
   }

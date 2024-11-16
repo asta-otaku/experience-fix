@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AttachmentContentPreview } from "../utils/BubbleSpecialInterfaces";
 import ImageModal from "./ImageModal";
@@ -13,8 +13,6 @@ interface TokenPreviewSpecialProps {
 function TokenPreviewSpecial({ token, direction }: TokenPreviewSpecialProps) {
   const { url, type } = token;
   const [faviconError, setFaviconError] = useState(false);
-  const [audioDuration, setAudioDuration] = useState<string>("");
-  const audioRef = useRef<HTMLAudioElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState<{ url: string; alt: string }>({
     url: "",
@@ -22,17 +20,6 @@ function TokenPreviewSpecial({ token, direction }: TokenPreviewSpecialProps) {
   });
 
   const filename = token.content?.name || token.name || "";
-
-  useEffect(() => {
-    if (isAudio && audioRef.current) {
-      audioRef.current.addEventListener("loadedmetadata", () => {
-        const duration = audioRef.current?.duration || 0;
-        const minutes = Math.floor(duration / 60);
-        const seconds = Math.floor(duration % 60);
-        setAudioDuration(`${minutes}:${seconds.toString().padStart(2, "0")}`);
-      });
-    }
-  }, []);
 
   // Function to get file extension from filename
   const getFileExtension = (filename: string) => {
@@ -155,8 +142,6 @@ function TokenPreviewSpecial({ token, direction }: TokenPreviewSpecialProps) {
               isCSV={isCSV}
               isExcel={isExcel}
               formatFileSize={formatFileSize}
-              audioDuration={audioDuration}
-              audioRef={audioRef}
               openImageModal={openImageModal}
               ContentWrapper={ContentWrapper}
             />
