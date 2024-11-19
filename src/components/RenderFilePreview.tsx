@@ -1,4 +1,3 @@
-import updown from "../assets/updown.svg";
 import AudioPlayer from "./AudioPlayer";
 
 function RenderFilePreview({
@@ -46,7 +45,7 @@ function RenderFilePreview({
           <img
             src={url}
             alt={filename}
-            className="w-full min-h-[175px] object-cover transition-opacity group-hover:opacity-90"
+            className="w-full h-auto transition-opacity group-hover:opacity-90"
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg" />
         </div>
@@ -59,7 +58,7 @@ function RenderFilePreview({
     return (
       <ContentWrapper>
         <div className="max-w-xs w-full overflow-hidden rounded-[14px]">
-          <video controls className="w-full min-h-[250px] h-auto">
+          <video controls className="w-full h-auto">
             <source src={fileUrl} type={`video/${fileExtension}`} />
             Your browser does not support the video tag.
           </video>
@@ -76,7 +75,6 @@ function RenderFilePreview({
           audioUrl={fileUrl}
           filename={filename}
           fileSize={fileSize}
-          updownIcon={updown}
         />
       </ContentWrapper>
     );

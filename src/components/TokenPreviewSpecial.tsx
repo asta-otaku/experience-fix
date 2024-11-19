@@ -101,7 +101,7 @@ function TokenPreviewSpecial({
       transition={transition}
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.2}
+      dragElastic={1}
       onDragEnd={(_, info) => {
         if (info.offset.x < -100) {
           handleSwipeLeft();

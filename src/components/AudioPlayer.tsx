@@ -10,14 +10,12 @@ interface AudioPlayerProps {
   audioUrl: string;
   filename: string;
   fileSize: string;
-  updownIcon: string;
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({
   audioUrl,
   filename,
   fileSize,
-  updownIcon,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState("00:00");
@@ -78,9 +76,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       <div className="flex justify-between items-center">
         <span className="text-sm font-medium max-w-40 truncate text-[#191919]">
           {filename}
-        </span>
-        <span className="text-xl">
-          <img src={updownIcon} alt="File icon" className="w-4 h-4" />
         </span>
       </div>
       <span className="text-xs text-[#7E7E7E] -mt-3">{fileSize}</span>
