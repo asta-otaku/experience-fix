@@ -17,21 +17,12 @@ const BubbleSpecial = () => {
   const [selectedAttachment, setSelectedAttachment] =
     useState<Attachment | null>(null);
   const [direction, setDirection] = useState<number>(0);
+  const [currentIndex, setCurrentIndex] = useState<number>(0); // Track current index
 
-  // Use motion values for smooth animation
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-
-  // Create springs for smooth return animation
-  const springX = useSpring(x, {
-    stiffness: 400,
-    damping: 30,
-  });
-
-  const springY = useSpring(y, {
-    stiffness: 400,
-    damping: 30,
-  });
+  const springX = useSpring(x, { stiffness: 400, damping: 50 });
+  const springY = useSpring(y, { stiffness: 400, damping: 50 });
 
   useEffect(() => {
     const fetchBubbleData = async () => {
@@ -45,6 +36,7 @@ const BubbleSpecial = () => {
         setOwner(response.data.ownerProfile.displayName);
         setBubbleData(artifact);
         setSelectedAttachment(artifact.attachments[0]);
+        setCurrentIndex(0); // Set the starting index
       } catch (error) {
         console.error("Error fetching bubble data", error);
       }
@@ -55,16 +47,40 @@ const BubbleSpecial = () => {
     }
   }, [slug]);
 
-  const handleAttachmentSelect = (attachment: Attachment, newIndex: number) => {
-    const currentIndex =
-      bubbleData?.attachments.findIndex(
-        (att) => att.content.id === selectedAttachment?.content.id
-      ) ?? 0;
+  const handleAttachmentSelect = (
+    attachment: Attachment,
+    targetIndex: number
+  ) => {
+    if (!bubbleData) return;
 
-    // Determine direction based on index difference
+    const newDirection = targetIndex > currentIndex ? 1 : -1;
+    setDirection(newDirection);
+
+    // Function to step through tokens one by one until reaching the target index
+    const stepThroughTokens = (stepIndex: number) => {
+      if (stepIndex === targetIndex) {
+        setSelectedAttachment(attachment);
+        setCurrentIndex(stepIndex);
+        return;
+      }
+      const nextAttachment = bubbleData.attachments[stepIndex];
+      setSelectedAttachment(nextAttachment);
+      setCurrentIndex(stepIndex);
+
+      // Recursive timeout to delay each step in the swipe
+      setTimeout(() => stepThroughTokens(stepIndex + newDirection), 300);
+    };
+
+    stepThroughTokens(currentIndex + newDirection);
+  };
+
+  const handleTokenSwipe = (newIndex: number) => {
+    if (!bubbleData) return;
+
     const newDirection = newIndex > currentIndex ? 1 : -1;
     setDirection(newDirection);
-    setSelectedAttachment(attachment);
+    setCurrentIndex(newIndex);
+    setSelectedAttachment(bubbleData.attachments[newIndex]);
   };
 
   const renderContent = (content: string, attachments: Attachment[]) => {
@@ -144,7 +160,7 @@ const BubbleSpecial = () => {
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.5 }}
       >
         <article className="bg-gradient-to-b from-[#3076FF] to-[#1D49E5] w-full text-[17px] pt-3 rounded-2xl">
           <div className="px-3 font-light text-white whitespace-pre-wrap break-words">
@@ -160,6 +176,9 @@ const BubbleSpecial = () => {
                   name: selectedAttachment.content.name || "Unnamed File",
                 }}
                 direction={direction}
+                currentIndex={currentIndex}
+                totalTokens={bubbleData.attachments.length}
+                onTokenSwipe={handleTokenSwipe}
               />
             )}
           </div>

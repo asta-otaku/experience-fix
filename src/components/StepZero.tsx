@@ -15,12 +15,12 @@ function StepZero({ handleNext }: { handleNext: () => void }) {
   // Create springs for smooth return animation
   const springX = useSpring(x, {
     stiffness: 400,
-    damping: 30,
+    damping: 50,
   });
 
   const springY = useSpring(y, {
     stiffness: 400,
-    damping: 30,
+    damping: 50,
   });
 
   return (
@@ -44,7 +44,7 @@ function StepZero({ handleNext }: { handleNext: () => void }) {
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.5 }}
       >
         <article className="bg-gradient-to-b from-[#3076FF] to-[#1D49E5] text-white text-[17px] pt-3 rounded-2xl">
           <div className="px-3 font-light">

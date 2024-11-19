@@ -59,7 +59,7 @@ function RenderFilePreview({
     return (
       <ContentWrapper>
         <div className="max-w-xs w-full overflow-hidden rounded-[14px]">
-          <video controls className="w-full h-[250px] object-cover">
+          <video controls className="w-full min-h-[250px] h-auto">
             <source src={fileUrl} type={`video/${fileExtension}`} />
             Your browser does not support the video tag.
           </video>
@@ -78,22 +78,6 @@ function RenderFilePreview({
           fileSize={fileSize}
           updownIcon={updown}
         />
-        {/* <div className="max-w-xs w-full p-3 flex flex-col gap-3 rounded-[14px] bg-white border border-solid border-[#1919191a]">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium max-w-40 truncate text-[#191919]">
-              {filename}
-            </span>
-            <span className="text-xl">
-              <img src={updown} alt="File size" className="w-4 h-4" />
-            </span>
-          </div>
-          <span className="text-xs text-[#7E7E7E] -mt-3">{fileSize}</span>
-          <span className="text-sm text-center">{audioDuration}</span>
-          <audio ref={audioRef} controls className="w-full">
-            <source src={fileUrl} type={`audio/${fileExtension}`} />
-            Your browser does not support the audio element.
-          </audio>
-        </div> */}
       </ContentWrapper>
     );
   }

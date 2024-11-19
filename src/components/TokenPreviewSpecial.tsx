@@ -8,9 +8,18 @@ import RenderFilePreview from "./RenderFilePreview";
 interface TokenPreviewSpecialProps {
   token: AttachmentContentPreview;
   direction: number;
+  currentIndex: number;
+  totalTokens: number;
+  onTokenSwipe: (index: number) => void;
 }
 
-function TokenPreviewSpecial({ token, direction }: TokenPreviewSpecialProps) {
+function TokenPreviewSpecial({
+  token,
+  direction,
+  currentIndex,
+  totalTokens,
+  onTokenSwipe,
+}: TokenPreviewSpecialProps) {
   const { url, type } = token;
   const [faviconError, setFaviconError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,9 +31,8 @@ function TokenPreviewSpecial({ token, direction }: TokenPreviewSpecialProps) {
   const filename = token.content?.name || token.name || "";
 
   // Function to get file extension from filename
-  const getFileExtension = (filename: string) => {
-    return filename.split(".").pop()?.toLowerCase() || "";
-  };
+  const getFileExtension = (filename: string) =>
+    filename.split(".").pop()?.toLowerCase() || "";
 
   // Get the file extension
   const fileExtension = getFileExtension(filename);
@@ -44,15 +52,9 @@ function TokenPreviewSpecial({ token, direction }: TokenPreviewSpecialProps) {
   const getDisplayUrl = (url: string) => {
     try {
       const urlObject = new URL(url);
-      return {
-        hostname: urlObject.hostname,
-        origin: urlObject.origin,
-      };
+      return { hostname: urlObject.hostname, origin: urlObject.origin };
     } catch {
-      return {
-        hostname: url,
-        origin: "",
-      };
+      return { hostname: url, origin: "" };
     }
   };
 
@@ -75,11 +77,7 @@ function TokenPreviewSpecial({ token, direction }: TokenPreviewSpecialProps) {
       x: direction > 0 ? 300 : -300,
       opacity: 0,
     }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-    },
+    center: { zIndex: 1, x: 0, opacity: 1 },
     exit: (direction: number) => ({
       zIndex: 0,
       x: direction < 0 ? 300 : -300,
@@ -101,6 +99,16 @@ function TokenPreviewSpecial({ token, direction }: TokenPreviewSpecialProps) {
       animate="center"
       exit="exit"
       transition={transition}
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.2}
+      onDragEnd={(_, info) => {
+        if (info.offset.x < -100) {
+          handleSwipeLeft();
+        } else if (info.offset.x > 100) {
+          handleSwipeRight();
+        }
+      }}
     >
       {children}
     </motion.div>
@@ -111,13 +119,23 @@ function TokenPreviewSpecial({ token, direction }: TokenPreviewSpecialProps) {
     setIsModalOpen(true);
   };
 
-  const closeImageModal = () => {
-    setIsModalOpen(false);
+  const closeImageModal = () => setIsModalOpen(false);
+
+  const handleSwipeLeft = () => {
+    if (currentIndex < totalTokens - 1) {
+      onTokenSwipe(currentIndex + 1);
+    }
+  };
+
+  const handleSwipeRight = () => {
+    if (currentIndex > 0) {
+      onTokenSwipe(currentIndex - 1);
+    }
   };
 
   return (
     <>
-      <div className="flex flex-col w-full bg-white rounded-2xl border relative overflow-hidden">
+      <div className="flex flex-col w-full bg-white rounded-2xl border relative overflow-hidden cursor-pointer">
         <AnimatePresence mode="wait" custom={direction}>
           {isLink ? (
             <RenderLinkPreview
