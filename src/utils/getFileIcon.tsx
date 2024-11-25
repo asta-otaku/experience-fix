@@ -9,7 +9,8 @@ import { Attachment } from "./BubbleSpecialInterfaces";
 export const getFileIcon = (
   fileName: string,
   attachment: Attachment,
-  selectedAttachment: Attachment | null
+  selectedAttachment: Attachment | null,
+  transitioning: boolean
 ) => {
   const fileExtension = fileName.split(".").pop()?.toLowerCase();
 
@@ -18,7 +19,8 @@ export const getFileIcon = (
     return (
       <img
         src={
-          selectedAttachment?.content.id === attachment.content.id
+          selectedAttachment?.content.id === attachment.content.id &&
+          !transitioning
             ? links
             : whitelinks
         }
@@ -38,7 +40,8 @@ export const getFileIcon = (
       return (
         <img
           src={
-            selectedAttachment?.content.id === attachment.content.id
+            selectedAttachment?.content.id === attachment.content.id &&
+            !transitioning
               ? blueAudio
               : audioIcon
           }

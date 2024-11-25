@@ -18,6 +18,7 @@ const BubbleSpecial = () => {
     useState<Attachment | null>(null);
   const [direction, setDirection] = useState<number>(0);
   const [currentIndex, setCurrentIndex] = useState<number>(0); // Track current index
+  const [transitioning, setTransitioning] = useState<boolean>(false); // Track animation state
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -51,16 +52,18 @@ const BubbleSpecial = () => {
     attachment: Attachment,
     targetIndex: number
   ) => {
-    if (!bubbleData) return;
+    if (!bubbleData || transitioning) return;
 
     const newDirection = targetIndex > currentIndex ? 1 : -1;
     setDirection(newDirection);
+    setTransitioning(true); // Start the animation process
 
     // Function to step through tokens one by one until reaching the target index
     const stepThroughTokens = (stepIndex: number) => {
       if (stepIndex === targetIndex) {
         setSelectedAttachment(attachment);
         setCurrentIndex(stepIndex);
+        setTransitioning(false); // End the animation process
         return;
       }
       const nextAttachment = bubbleData.attachments[stepIndex];
@@ -72,15 +75,6 @@ const BubbleSpecial = () => {
     };
 
     stepThroughTokens(currentIndex + newDirection);
-  };
-
-  const handleTokenSwipe = (newIndex: number) => {
-    if (!bubbleData) return;
-
-    const newDirection = newIndex > currentIndex ? 1 : -1;
-    setDirection(newDirection);
-    setCurrentIndex(newIndex);
-    setSelectedAttachment(bubbleData.attachments[newIndex]);
   };
 
   const renderContent = (content: string, attachments: Attachment[]) => {
@@ -106,7 +100,9 @@ const BubbleSpecial = () => {
   };
 
   const renderAttachmentButton = (attachment: Attachment, index: number) => {
-    const isSelected = selectedAttachment?.content.id === attachment.content.id;
+    const isSelected =
+      selectedAttachment?.content.id === attachment.content.id &&
+      !transitioning;
     const backgroundClass = isSelected
       ? "bg-white text-secondary"
       : "bg-[#FFFFFF33] text-white";
@@ -126,7 +122,8 @@ const BubbleSpecial = () => {
           {getFileIcon(
             attachment.content.name || "",
             attachment,
-            selectedAttachment
+            selectedAttachment,
+            transitioning
           )}
         </span>
         <span className="text-inherit max-w-20 w-full truncate">
@@ -178,7 +175,12 @@ const BubbleSpecial = () => {
                 direction={direction}
                 currentIndex={currentIndex}
                 totalTokens={bubbleData.attachments.length}
-                onTokenSwipe={handleTokenSwipe}
+                onTokenSwipe={(newIndex) =>
+                  handleAttachmentSelect(
+                    bubbleData.attachments[newIndex],
+                    newIndex
+                  )
+                }
               />
             )}
           </div>

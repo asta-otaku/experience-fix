@@ -39,7 +39,7 @@ function RenderFilePreview({
     return (
       <ContentWrapper>
         <div
-          className="max-w-xs w-full overflow-hidden rounded-[14px] cursor-pointer relative group"
+          className="max-w-xs w-full min-h-full overflow-hidden rounded-[14px] cursor-pointer relative group"
           onClick={() => openImageModal(url, filename)}
         >
           <img
@@ -57,7 +57,7 @@ function RenderFilePreview({
   if (isVideo && fileUrl) {
     return (
       <ContentWrapper>
-        <div className="max-w-xs w-full overflow-hidden rounded-[14px]">
+        <div className="max-w-xs w-full min-h-full overflow-hidden rounded-[14px]">
           <video controls className="w-full h-auto">
             <source src={fileUrl} type={`video/${fileExtension}`} />
             Your browser does not support the video tag.
