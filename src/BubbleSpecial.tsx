@@ -17,8 +17,8 @@ const BubbleSpecial = () => {
   const [selectedAttachment, setSelectedAttachment] =
     useState<Attachment | null>(null);
   const [direction, setDirection] = useState<number>(0);
-  const [currentIndex, setCurrentIndex] = useState<number>(0); // Track current index
-  const [transitioning, setTransitioning] = useState<boolean>(false); // Track animation state
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [transitioning, setTransitioning] = useState<boolean>(false);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -37,7 +37,7 @@ const BubbleSpecial = () => {
         setOwner(response.data.ownerProfile.displayName);
         setBubbleData(artifact);
         setSelectedAttachment(artifact.attachments[0]);
-        setCurrentIndex(0); // Set the starting index
+        setCurrentIndex(0);
       } catch (error) {
         console.error("Error fetching bubble data", error);
       }
@@ -48,40 +48,37 @@ const BubbleSpecial = () => {
     }
   }, [slug]);
 
-  const handleAttachmentSelect = (
-    attachment: Attachment,
-    targetIndex: number
-  ) => {
+  const handleAttachmentSelect = (_: Attachment, targetIndex: number) => {
     if (!bubbleData || transitioning) return;
 
     const newDirection = targetIndex > currentIndex ? 1 : -1;
-    setDirection(newDirection);
-    setTransitioning(true); // Start the animation process
+    setTransitioning(true);
 
-    // Function to step through tokens one by one until reaching the target index
-    const stepThroughTokens = (stepIndex: number) => {
-      if (stepIndex === targetIndex) {
-        setSelectedAttachment(attachment);
-        setCurrentIndex(stepIndex);
-        setTransitioning(false); // End the animation process
-        return;
+    const stepToTarget = (currentStep: number) => {
+      const nextStep =
+        newDirection > 0
+          ? Math.min(currentStep + 1, targetIndex)
+          : Math.max(currentStep - 1, targetIndex);
+
+      setSelectedAttachment(bubbleData.attachments[nextStep]);
+      setCurrentIndex(nextStep);
+      setDirection(newDirection);
+
+      if (nextStep !== targetIndex) {
+        setTimeout(() => stepToTarget(nextStep), 200);
+      } else {
+        setTransitioning(false);
       }
-      const nextAttachment = bubbleData.attachments[stepIndex];
-      setSelectedAttachment(nextAttachment);
-      setCurrentIndex(stepIndex);
-
-      // Recursive timeout to delay each step in the swipe
-      setTimeout(() => stepThroughTokens(stepIndex + newDirection), 300);
     };
 
-    stepThroughTokens(currentIndex + newDirection);
+    stepToTarget(currentIndex);
   };
 
   const renderContent = (content: string, attachments: Attachment[]) => {
     if (!content) return <p>No content available</p>;
 
     const contentParts = content.split("$");
-    const elements = contentParts.flatMap((part, index) => {
+    return contentParts.flatMap((part, index) => {
       const textElement = (
         <span
           key={`text-${index}`}
@@ -95,8 +92,6 @@ const BubbleSpecial = () => {
           : null;
       return [textElement, attachmentElement];
     });
-
-    return elements;
   };
 
   const renderAttachmentButton = (attachment: Attachment, index: number) => {
@@ -143,10 +138,7 @@ const BubbleSpecial = () => {
         className="flex flex-col w-[360px] mx-auto p-6"
         drag
         dragMomentum={false}
-        style={{
-          x: springX,
-          y: springY,
-        }}
+        style={{ x: springX, y: springY }}
         onDrag={(_, info) => {
           x.set(info.offset.x);
           y.set(info.offset.y);
@@ -181,6 +173,7 @@ const BubbleSpecial = () => {
                     newIndex
                   )
                 }
+                allTokens={bubbleData.attachments}
               />
             )}
           </div>
