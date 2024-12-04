@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SlClose } from "react-icons/sl";
 
 function ImageModal({
@@ -13,6 +13,8 @@ function ImageModal({
   imageUrl: string;
   altText: string;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
+
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -40,23 +42,32 @@ function ImageModal({
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.95 }}
-            className="relative max-w-[90vw] max-h-[90vh]"
+            initial={{ y: 0 }}
+            animate={{ y: 0 }}
+            exit={{ y: 0 }}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 100 }}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 100) onClose();
+            }}
+            className="relative w-auto h-full"
             onClick={(e) => e.stopPropagation()}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
           >
             <button
               onClick={onClose}
-              className="absolute -top-10 right-0 p-2 text-white hover:text-gray-300 transition-colors"
+              className={`absolute top-0 left-5 p-2 text-white hover:text-gray-300 transition-colors ${
+                isHovered ? "opacity-100" : "opacity-0"
+              }`}
               aria-label="Close modal"
             >
-              <SlClose width={24} height={24} />
+              <SlClose size={24} />
             </button>
             <img
               src={imageUrl}
               alt={altText}
-              className="max-w-full max-h-[90vh] object-contain rounded-lg"
+              className="h-full w-auto object-contain"
             />
           </motion.div>
         </motion.div>

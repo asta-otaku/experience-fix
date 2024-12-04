@@ -24,6 +24,7 @@ const BubbleSpecial = () => {
   const y = useMotionValue(0);
   const springX = useSpring(x, { stiffness: 400, damping: 50 });
   const springY = useSpring(y, { stiffness: 400, damping: 50 });
+  const [isDraggingDisabled, setIsDraggingDisabled] = useState(false);
 
   useEffect(() => {
     const fetchBubbleData = async () => {
@@ -136,7 +137,7 @@ const BubbleSpecial = () => {
     <div className="w-full min-h-screen flex justify-center items-center flex-col py-16 relative p-4">
       <motion.div
         className="flex flex-col w-[360px] mx-auto p-6"
-        drag
+        drag={!isDraggingDisabled} // Disable drag when interactions occur in child
         dragMomentum={false}
         style={{ x: springX, y: springY }}
         onDrag={(_, info) => {
@@ -174,6 +175,7 @@ const BubbleSpecial = () => {
                   )
                 }
                 allTokens={bubbleData.attachments}
+                setIsDraggingDisabled={setIsDraggingDisabled} // Pass setter to child
               />
             )}
           </div>

@@ -15,16 +15,21 @@ interface TokenPreviewSpecialProps {
   totalTokens: number;
   onTokenSwipe: (index: number) => void;
   allTokens: AttachmentContentPreview[];
+  setIsDraggingDisabled: (disabled: boolean) => void; // New prop
 }
 
 function TokenPreviewSpecial({
   token,
-  // direction,
   currentIndex,
-  // totalTokens,
   onTokenSwipe,
   allTokens,
+  setIsDraggingDisabled, // Destructure the prop
 }: TokenPreviewSpecialProps) {
+  useEffect(() => {
+    if (swiperRef.current) {
+      swiperRef.current.swiper.slideTo(currentIndex);
+    }
+  }, [currentIndex]);
   const [faviconError, setFaviconError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState<{ url: string; alt: string }>({
@@ -127,19 +132,22 @@ function TokenPreviewSpecial({
 
   return (
     <>
-      <div className="flex flex-col w-full bg-white rounded-2xl border relative overflow-hidden">
+      <div
+        className="flex flex-col w-full bg-white rounded-2xl border relative overflow-hidden"
+        onMouseEnter={() => setIsDraggingDisabled(true)} // Disable drag on hover
+        onMouseLeave={() => setIsDraggingDisabled(false)} // Re-enable drag on leave
+      >
         <Swiper
           ref={swiperRef}
           spaceBetween={0}
           slidesPerView={1}
           initialSlide={currentIndex}
           onSlideChange={(swiper) => {
-            // Only call onTokenSwipe if the slide change was user-initiated
             if (swiper.activeIndex !== currentIndex) {
               onTokenSwipe(swiper.activeIndex);
             }
           }}
-          className="w-full"
+          className="w-full rounded-none"
         >
           {allTokens.map((currentToken, index) => (
             <SwiperSlide key={index} className="relative">
