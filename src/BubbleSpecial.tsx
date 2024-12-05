@@ -55,24 +55,13 @@ const BubbleSpecial = () => {
     const newDirection = targetIndex > currentIndex ? 1 : -1;
     setTransitioning(true);
 
-    const stepToTarget = (currentStep: number) => {
-      const nextStep =
-        newDirection > 0
-          ? Math.min(currentStep + 1, targetIndex)
-          : Math.max(currentStep - 1, targetIndex);
+    setSelectedAttachment(bubbleData.attachments[targetIndex]);
+    setCurrentIndex(targetIndex);
+    setDirection(newDirection);
 
-      setSelectedAttachment(bubbleData.attachments[nextStep]);
-      setCurrentIndex(nextStep);
-      setDirection(newDirection);
-
-      if (nextStep !== targetIndex) {
-        setTimeout(() => stepToTarget(nextStep), 200);
-      } else {
-        setTransitioning(false);
-      }
-    };
-
-    stepToTarget(currentIndex);
+    setTimeout(() => {
+      setTransitioning(false);
+    }, 200);
   };
 
   const renderContent = (content: string, attachments: Attachment[]) => {
