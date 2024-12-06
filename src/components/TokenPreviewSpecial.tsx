@@ -9,74 +9,30 @@ import RenderFilePreview from "./RenderFilePreview";
 import "swiper/css";
 
 interface TokenPreviewSpecialProps {
-  token: AttachmentContentPreview;
-  direction: number;
   currentIndex: number;
-  totalTokens: number;
-  onTokenSwipe: (index: number) => void;
   allTokens: AttachmentContentPreview[];
+  onTokenSwipe: (index: number) => void;
   setIsDraggingDisabled: (disabled: boolean) => void; // New prop
 }
 
 function TokenPreviewSpecial({
-  token,
   currentIndex,
-  onTokenSwipe,
   allTokens,
-  setIsDraggingDisabled, // Destructure the prop
+  onTokenSwipe,
+  setIsDraggingDisabled,
 }: TokenPreviewSpecialProps) {
-  useEffect(() => {
-    if (swiperRef.current) {
-      swiperRef.current.swiper.slideTo(currentIndex);
-    }
-  }, [currentIndex]);
-  const [faviconError, setFaviconError] = useState(false);
+  const swiperRef = useRef<SwiperRef>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState<{ url: string; alt: string }>({
     url: "",
     alt: "",
   });
-  // const [contentHeight, setContentHeight] = useState("auto");
-  const swiperRef = useRef<SwiperRef>(null);
 
-  const { url, type } = token;
-  const filename = token.content?.name || token.name || "";
-
-  const getFileExtension = (filename: string) =>
-    filename.split(".").pop()?.toLowerCase() || "";
-  const fileExtension = getFileExtension(filename);
-
-  const isLink = type === "LINK" || (!fileExtension && url?.startsWith("http"));
-  const isImage = /^(jpg|jpeg|png|gif|bmp|webp|heic)$/i.test(fileExtension);
-  const isVideo = /^(mp4|webm|ogg|mov|avi)$/i.test(fileExtension);
-  const isAudio = /^(mp3|wav|ogg|m4a)$/i.test(fileExtension);
-  const isPDF = /^pdf$/i.test(fileExtension);
-  const isZip = /^(zip|rar|7z)$/i.test(fileExtension);
-  const isCSV = /^csv$/i.test(fileExtension);
-  const isExcel = /^(xls|xlsx)$/i.test(fileExtension);
-
-  const getDisplayUrl = (url: string) => {
-    try {
-      const urlObject = new URL(url);
-      return { hostname: urlObject.hostname, origin: urlObject.origin };
-    } catch {
-      return { hostname: url, origin: "" };
+  useEffect(() => {
+    if (swiperRef.current) {
+      swiperRef.current.swiper.slideTo(currentIndex);
     }
-  };
-
-  const formatFileSize = (bytes?: number) => {
-    if (!bytes) return "";
-    const units = ["B", "KB", "MB", "GB"];
-    let size = bytes;
-    let unitIndex = 0;
-
-    while (size >= 1024 && unitIndex < units.length - 1) {
-      size /= 1024;
-      unitIndex++;
-    }
-
-    return `${size.toFixed(1)} ${units[unitIndex]}`;
-  };
+  }, [currentIndex]);
 
   const openImageModal = (url: string, alt: string) => {
     setModalImage({ url, alt });
@@ -85,27 +41,56 @@ function TokenPreviewSpecial({
 
   const closeImageModal = () => setIsModalOpen(false);
 
-  const RenderContent = ({
-    token,
-  }: {
-    token: AttachmentContentPreview;
-    index: number;
-  }) => {
+  const RenderContent = ({ token }: { token: AttachmentContentPreview }) => {
+    const filename = token.content?.name || token.name || "";
+    const getFileExtension = (filename: string) =>
+      filename.split(".").pop()?.toLowerCase() || "";
+    const fileExtension = getFileExtension(filename);
+
+    const isLink =
+      token.type === "LINK" ||
+      (!fileExtension && (token.url ?? "").startsWith("http"));
+    const isImage = /^(jpg|jpeg|png|gif|bmp|webp|heic)$/i.test(fileExtension);
+    const isVideo = /^(mp4|webm|ogg|mov|avi)$/i.test(fileExtension);
+    const isAudio = /^(mp3|wav|ogg|m4a)$/i.test(fileExtension);
+    const isPDF = /^pdf$/i.test(fileExtension);
+    const isZip = /^(zip|rar|7z)$/i.test(fileExtension);
+    const isCSV = /^csv$/i.test(fileExtension);
+    const isExcel = /^(xls|xlsx)$/i.test(fileExtension);
+
+    const formatFileSize = (bytes?: number) => {
+      if (!bytes) return "";
+      const units = ["B", "KB", "MB", "GB"];
+      let size = bytes;
+      let unitIndex = 0;
+
+      while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024;
+        unitIndex++;
+      }
+
+      return `${size.toFixed(1)} ${units[unitIndex]}`;
+    };
+
     if (isLink) {
       return (
         <RenderLinkPreview
           token={token}
-          getDisplayUrl={getDisplayUrl}
-          setFaviconError={setFaviconError}
-          faviconError={faviconError}
+          setFaviconError={() => {}}
+          faviconError={false}
           openImageModal={openImageModal}
           ContentWrapper={({ children }: any) => <>{children}</>}
+          getDisplayUrl={(url: string) => {
+            const { hostname, origin } = new URL(url);
+            return { hostname, origin };
+          }}
         />
       );
     }
+
     return (
       <RenderFilePreview
-        url={token.url}
+        url={token?.cloudFrontDownloadLink ?? ""}
         filename={filename}
         fileExtension={fileExtension}
         token={token}
@@ -123,19 +108,12 @@ function TokenPreviewSpecial({
     );
   };
 
-  // Effect to handle swipe programmatically when currentIndex changes
-  useEffect(() => {
-    if (swiperRef.current) {
-      swiperRef.current.swiper.slideTo(currentIndex);
-    }
-  }, [currentIndex]);
-
   return (
     <>
       <div
         className="flex flex-col w-full bg-white rounded-2xl border relative overflow-hidden"
-        onMouseEnter={() => setIsDraggingDisabled(true)} // Disable drag on hover
-        onMouseLeave={() => setIsDraggingDisabled(false)} // Re-enable drag on leave
+        onMouseEnter={() => setIsDraggingDisabled(true)}
+        onMouseLeave={() => setIsDraggingDisabled(false)}
       >
         <Swiper
           ref={swiperRef}
@@ -149,9 +127,9 @@ function TokenPreviewSpecial({
           }}
           className="w-full rounded-none"
         >
-          {allTokens.map((currentToken, index) => (
+          {allTokens.map((token, index) => (
             <SwiperSlide key={index} className="relative">
-              <RenderContent token={currentToken} index={index} />
+              <RenderContent token={token} />
             </SwiperSlide>
           ))}
         </Swiper>

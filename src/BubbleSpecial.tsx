@@ -16,7 +16,7 @@ const BubbleSpecial = () => {
   const [owner, setOwner] = useState<string>("");
   const [selectedAttachment, setSelectedAttachment] =
     useState<Attachment | null>(null);
-  const [direction, setDirection] = useState<number>(0);
+  // const [direction, setDirection] = useState<number>(0);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [transitioning, setTransitioning] = useState<boolean>(false);
 
@@ -52,12 +52,12 @@ const BubbleSpecial = () => {
   const handleAttachmentSelect = (_: Attachment, targetIndex: number) => {
     if (!bubbleData || transitioning) return;
 
-    const newDirection = targetIndex > currentIndex ? 1 : -1;
+    // const newDirection = targetIndex > currentIndex ? 1 : -1;
     setTransitioning(true);
 
     setSelectedAttachment(bubbleData.attachments[targetIndex]);
     setCurrentIndex(targetIndex);
-    setDirection(newDirection);
+    // setDirection(newDirection);
 
     setTimeout(() => {
       setTransitioning(false);
@@ -149,14 +149,7 @@ const BubbleSpecial = () => {
           <div className="bubble-bottom mt-2 w-full">
             {selectedAttachment && (
               <TokenPreviewSpecial
-                token={{
-                  ...selectedAttachment,
-                  url: selectedAttachment.cloudFrontDownloadLink,
-                  name: selectedAttachment.content.name || "Unnamed File",
-                }}
-                direction={direction}
                 currentIndex={currentIndex}
-                totalTokens={bubbleData.attachments.length}
                 onTokenSwipe={(newIndex) =>
                   handleAttachmentSelect(
                     bubbleData.attachments[newIndex],
