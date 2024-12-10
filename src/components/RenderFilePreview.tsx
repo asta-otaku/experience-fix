@@ -1,4 +1,8 @@
 import AudioPlayer from "./AudioPlayer";
+import { Worker, Viewer, SpecialZoomLevel } from "@react-pdf-viewer/core";
+import { ScrollMode } from "@react-pdf-viewer/core";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
 function RenderFilePreview({
   url,
@@ -84,18 +88,17 @@ function RenderFilePreview({
   if (isPDF && fileUrl) {
     return (
       <ContentWrapper>
-        <object
-          data={fileUrl}
-          type="application/pdf"
-          width="100%"
-          height="175px"
-          className="rounded-[14px]"
-        >
-          <p>
-            Your browser does not support PDFs.{" "}
-            <a href={fileUrl}>Download PDF</a>.
-          </p>
-        </object>
+        <div className="rounded-[14px] max-w-xs w-full overflow-hidden">
+          <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+            <div className="h-[350px]">
+              <Viewer
+                fileUrl={fileUrl}
+                defaultScale={SpecialZoomLevel.PageWidth}
+                scrollMode={ScrollMode.Page}
+              />
+            </div>
+          </Worker>
+        </div>
       </ContentWrapper>
     );
   }
