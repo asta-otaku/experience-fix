@@ -51,7 +51,7 @@ function TokenPreviewSpecial({
       token.type === "LINK" ||
       (!fileExtension && (token.url ?? "").startsWith("http"));
     const isImage = /^(jpg|jpeg|png|gif|bmp|webp|heic)$/i.test(fileExtension);
-    const isVideo = /^(mp4|webm|ogg|mov|avi)$/i.test(fileExtension);
+    const isVideo = /^(mp4|webm|ogg|mov|avi|MOV)$/i.test(fileExtension);
     const isAudio = /^(mp3|wav|ogg|m4a)$/i.test(fileExtension);
     const isPDF = /^pdf$/i.test(fileExtension);
     const isZip = /^(zip|rar|7z)$/i.test(fileExtension);

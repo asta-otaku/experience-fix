@@ -59,11 +59,23 @@ function RenderFilePreview({
 
   // Video Preview with animation
   if (isVideo && fileUrl) {
+    const getVideoMimeType = (extension: string) => {
+      const extensionToMimeType: { [key: string]: string } = {
+        mp4: "video/mp4",
+        webm: "video/webm",
+        ogg: "video/ogg",
+        mov: "video/quicktime",
+        avi: "video/x-msvideo",
+        MOV: "video/quicktime",
+      };
+      return extensionToMimeType[extension] || `video/${extension}`;
+    };
+
     return (
       <ContentWrapper>
         <div className="max-w-xs w-full min-h-full overflow-hidden rounded-[14px]">
           <video controls className="w-full h-auto">
-            <source src={fileUrl} type={`video/${fileExtension}`} />
+            <source src={fileUrl} type={getVideoMimeType(fileExtension)} />
             Your browser does not support the video tag.
           </video>
         </div>
