@@ -47,7 +47,7 @@ function StepZero({ handleNext }: { handleNext: () => void }) {
         transition={{ duration: 0.5 }}
       >
         <article className="bg-gradient-to-b from-[#3076FF] to-[#1D49E5] text-white text-[17px] pt-3 rounded-2xl">
-          <div className="px-3 font-light">
+          <div className="px-3 text-[17px]">
             Typo is the best way to share your ideas. <br />
             They can be{" "}
             <button
